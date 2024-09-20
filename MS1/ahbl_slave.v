@@ -11,16 +11,15 @@ module ahbl_slave #(parameter ID = 32'hABCD_EF00) (
     input   wire [31:0] HWDATA,
     output  wire        HREADYOUT,
     output  wire [31:0] HRDATA
-    
+    output wire [31:0] register_0_output,
+    output wire [31:0] register_1_output,
+    output wire [31:0] register_2_output,    
 );
     reg [31:0] HADDR_d;
     reg [1:0]  HTRANS_d;
     reg [2:0]  HSIZE_d;
     reg        HWRITE_d;
     reg        HSEL_d;
-    reg [31:0] register_1_data;
-    reg [31:0] register_2_data;
-    reg [31:0] register_3_data;
     reg[2:0] load;
     
     always @(posedge HCLK or negedge HRESETn) begin
@@ -58,24 +57,24 @@ module ahbl_slave #(parameter ID = 32'hABCD_EF00) (
         .clk(HCLK),
         .rst_n(HRESETn),
         .load(load[0]),
-        .D(register_1_data),
-        .Q(HWDATA)
+        .D(HWDATA),
+        .Q(register_0_output)
     );
 
     register register_1(
         .clk(HCLK),
         .rst_n(HRESETn),
         .load(load[1]),
-        .D(register_2_data),
-        .Q(HWDATA)
+        .D(HWDATA),
+        .Q(register_1_output)
     );
 
     register register_2(
         .clk(HCLK),
         .rst_n(HRESETn),
         .load(load[2]),
-        .D(register_3_data),
-        .Q(HWDATA)
+        .D(HWDATA),
+        .Q(register_2_output)
     );
     assign HREADYOUT = 1;
     assign HRDATA = ID;
