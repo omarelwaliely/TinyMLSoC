@@ -1,6 +1,6 @@
-module ahbl_splitter_4 #(parameter  S0=32'h00_000000, 
+module ahbl_splitter_4 #(parameter  S0=32'h40_000000, 
                                     S1=32'h20_000000, 
-                                    S2=32'h40_000000, 
+                                    S2=32'h00_000000, 
                                     S3=32'h80_000000) 
 (
     input   wire        HCLK,
@@ -37,11 +37,11 @@ module ahbl_splitter_4 #(parameter  S0=32'h00_000000,
     reg [3:0] sel;
     reg [3:0] sel_d;
     always @*
-        case(HADDR)
-            S0: sel = 4'b0001;
-            S1: sel = 4'b0010;
-            S2: sel = 4'b0100;
-            S3: sel = 4'b1000;
+        case(HADDR[31:28])
+            4'h4: sel = 4'b0001;
+            4'h2: sel = 4'b0010;
+            4'h0: sel = 4'b0100;
+            4'h8: sel = 4'b1000;
             default: sel = 4'b0000;
         endcase
     assign S0_HSEL = sel[0];

@@ -24,7 +24,7 @@ module ahbl_master (
         HSIZE = size;
         @(posedge HCLK);
         HTRANS = 2'b00;
-        #2;
+        #5
         wait (HREADY == 1'b1);
         @(negedge HCLK) begin
             if(size == 0) 
@@ -66,13 +66,22 @@ module ahbl_master (
         ahbl_w_write(32'h00_000000, 32'h12345670, 2);
         ahbl_w_write(32'h20_000000, 32'h12345674, 2);
         ahbl_w_write(32'h40_000000, 32'h12345678, 2);
+        ahbl_w_write(32'h41_000000, 32'h55555555, 2);
         ahbl_w_write(32'h80_000000, 32'h1234567C, 2);
 
+        #100;
         // Do some reads
-        ahbl_read(32'h00_000000, 2);
+        ahbl_read(32'h41_000000, 2);
+        //ahbl_read(32'h40_000000, 2);
+        //ahbl_read(32'h40_000000, 2);
+
+
+        
+        
 
         // terminate the simulation 
         #100;
+        
         $finish;
     end
 

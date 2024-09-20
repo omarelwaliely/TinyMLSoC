@@ -11,6 +11,6 @@ module register #(parameter n = 32)(
         end else if (load) begin
             Q <= D;
         end
-        else Q <= Q
+        else Q <= Q;
     end
 endmodule
