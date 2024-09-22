@@ -11,7 +11,7 @@ module RAM_slave #(parameter ID = 32'hABCD_EF00) (
     input   wire        HWRITE,
     input   wire        HSEL,
     input   wire [31:0] HWDATA,
-    output  wire        HREADYOUT,
+    output  reg        HREADYOUT,
     output  reg [31:0] HRDATA
     
 );
@@ -48,6 +48,7 @@ module RAM_slave #(parameter ID = 32'hABCD_EF00) (
     // Memory is byte addressable
     always @(posedge HCLK) begin
         if(HRESETn & ahbl_we) begin
+            HREADYOUT <= 0;
             case(HSIZE_d)
                 3'b000: mem[HADDR[12:0]] <= HWDATA[7:0];
                 3'b001: {mem[HADDR[12:0]+1], mem[HADDR[12:0]]} <= HWDATA[15:0];
@@ -55,6 +56,7 @@ module RAM_slave #(parameter ID = 32'hABCD_EF00) (
                 default: mem[HADDR[12:0]] <= HWDATA;
             endcase
             $display("Slave %h: WRITE 0x%8x to 0x%8x", ID, HWDATA, HADDR_d);
+            HREADYOUT <= 1;
         end
     end
 
@@ -63,6 +65,7 @@ module RAM_slave #(parameter ID = 32'hABCD_EF00) (
         if(!HRESETn) begin
             HRDATA <= 0;
         end else if(ahbl_rd & HREADY) begin
+            HREADYOUT <= 0;
             case(HSIZE_d)
                 3'b000: HRDATA <= {24'b0, mem[HADDR[12:0]]};
                 3'b001: HRDATA <= {16'b0, mem[HADDR[12:0]+1], mem[HADDR[12:0]]};
@@ -70,9 +73,8 @@ module RAM_slave #(parameter ID = 32'hABCD_EF00) (
                                   mem[HADDR[12:0]+1], mem[HADDR[12:0]]};
                 default: HRDATA <= mem[HADDR[12:0]];
             endcase
+            HREADYOUT <= 1;
         end
     end
-
-    assign HREADYOUT = 1;
     // assign HRDATA = ID;
 endmodule

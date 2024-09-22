@@ -9,7 +9,7 @@ module ahbl_slave_with_reg #(parameter ID = 32'hABCD_EF00) (
     input   wire        HWRITE,
     input   wire        HSEL,
     input   wire [31:0] HWDATA,
-    output  wire        HREADYOUT,
+    output  reg        HREADYOUT,
     output  reg [31:0] HRDATA,
     output wire [31:0] register_0_output,
     output wire [31:0] register_1_output,
@@ -44,6 +44,7 @@ module ahbl_slave_with_reg #(parameter ID = 32'hABCD_EF00) (
     always @(posedge HCLK) begin
         if (HRESETn) begin
             if (ahbl_we) begin
+                HREADYOUT <= 0;
                 $display("Slave %h: WRITE 0x%8x to 0x%8x", ID, HWDATA, HADDR_d);
                 case (HADDR_d[3:0])
                     4'h0: load <= 3'b001;
@@ -51,17 +52,20 @@ module ahbl_slave_with_reg #(parameter ID = 32'hABCD_EF00) (
                     4'h2: load <= 3'b100; 
                     default: load <= 3'b001;
                 endcase
+                HREADYOUT <= 1;
             end else begin
                 load <= 3'b000;
             end
             
             if (ahbl_read) begin
+                HREADYOUT <= 0;
                 case (HADDR_d[3:0])
                     4'h0: HRDATA <= register_0_output;
                     4'h1: HRDATA <= register_1_output;
                     4'h2: HRDATA <= register_2_output; 
                     default: HRDATA <= register_0_output;
                 endcase
+                HREADYOUT <= 1;
             end
         end
     end
@@ -90,5 +94,4 @@ module ahbl_slave_with_reg #(parameter ID = 32'hABCD_EF00) (
         .D(HWDATA),
         .Q(register_2_output)
     );
-    assign HREADYOUT = 1;
 endmodule

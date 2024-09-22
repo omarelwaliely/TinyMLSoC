@@ -24,7 +24,6 @@ module ahbl_master (
         HSIZE = size;
         @(posedge HCLK);
         HTRANS = 2'b00;
-        #5
         wait (HREADY == 1'b1);
         @(negedge HCLK) begin
             if(size == 0) 
