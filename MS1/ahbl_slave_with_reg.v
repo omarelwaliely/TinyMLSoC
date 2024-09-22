@@ -45,7 +45,7 @@ module ahbl_slave_with_reg #(parameter ID = 32'hABCD_EF00) (
         if (HRESETn) begin
             if (ahbl_we) begin
                 $display("Slave %h: WRITE 0x%8x to 0x%8x", ID, HWDATA, HADDR_d);
-                case (HADDR_d[27:24])
+                case (HADDR_d[3:0])
                     4'h0: load <= 3'b001;
                     4'h1: load <= 3'b010;
                     4'h2: load <= 3'b100; 
@@ -56,7 +56,7 @@ module ahbl_slave_with_reg #(parameter ID = 32'hABCD_EF00) (
             end
             
             if (ahbl_read) begin
-                case (HADDR_d[27:24])
+                case (HADDR_d[3:0])
                     4'h0: HRDATA <= register_0_output;
                     4'h1: HRDATA <= register_1_output;
                     4'h2: HRDATA <= register_2_output; 

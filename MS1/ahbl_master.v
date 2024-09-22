@@ -61,17 +61,44 @@ module ahbl_master (
 
     initial begin
         @(posedge HRESETn);
-        #100;
-        // do some reads and writes
-        ahbl_w_write(32'h00_000000, 32'h12345670, 2);
-        ahbl_w_write(32'h20_000000, 32'h12345674, 2);
-        ahbl_w_write(32'h40_000000, 32'h12345678, 2);
-        ahbl_w_write(32'h41_000000, 32'h55555555, 2);
-        ahbl_w_write(32'h80_000000, 32'h1234567C, 2);
+        // #100;
+        // // do some reads and writes
+        // ahbl_w_write(32'h20_000000, 32'h12345674, 2);
+        // ahbl_w_write(32'h40_000000, 32'h12345678, 2);
+        // ahbl_w_write(32'h41_000000, 32'h55555555, 2);
+        // ahbl_w_write(32'h80_000000, 32'h1234567C, 2);
+
+        //test peripheral
+        ahbl_w_write(32'h40_000001, 32'h00000001, 2);
+        ahbl_w_write(32'h40_000002, 32'h00000002, 2);
+        $display("----------writing done (peripheral)-----------");
+
+        #200;
+        // Do some reads
+        
+        ahbl_read(32'h40_000002, 2);
+        ahbl_read(32'h40_000001, 2);
+        ahbl_read(32'h40_000003, 2);
+        $display("-----------reading done (peripheral) ----------------");
+
+        #200;
+        //test RAM 
+        ahbl_w_write(32'h00_000001, 32'h00000003, 2);
+        ahbl_w_write(32'h20_000002, 32'h00000004, 2);
+
+        $display("----------writing done (RAM)-----------");
 
         #100;
-        // Do some reads
-        ahbl_read(32'h41_000000, 2);
+        ahbl_read(32'h00_000001, 2);
+        ahbl_read(32'h20_000002, 2);
+        ahbl_read(32'h20_000101, 2);
+
+        $display("----------writing done (RAM)-----------");
+
+
+
+
+
         //ahbl_read(32'h40_000000, 2);
         //ahbl_read(32'h40_000000, 2);
 
