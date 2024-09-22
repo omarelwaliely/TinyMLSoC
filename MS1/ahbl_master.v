@@ -83,8 +83,10 @@ module ahbl_master (
 
         #200;
         //test RAM 
-        ahbl_w_write(32'h00_000001, 32'h00000003, 2);
+        ahbl_w_write(32'h00_000001, 32'h00000003, 4);
         ahbl_w_write(32'h20_000002, 32'h00000004, 2);
+        ahbl_w_write(32'h00_000004, 32'hAABBCCDD, 2); 
+        ahbl_w_write(32'h00_000008, 32'h00DBDBDB, 1); 
 
         $display("----------writing done (RAM)-----------");
 
@@ -92,7 +94,11 @@ module ahbl_master (
         ahbl_read(32'h00_000001, 2);
         ahbl_read(32'h20_000002, 2);
         ahbl_read(32'h20_000101, 2);
-
+        ahbl_read(32'h00_000004, 2); 
+        ahbl_read(32'h00_000004, 1);
+        ahbl_read(32'h00_000006, 1); 
+        ahbl_read(32'h00_000008, 0);
+        ahbl_read(32'h00_000008, 1);
         $display("----------writing done (RAM)-----------");
 
 
