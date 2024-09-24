@@ -3,7 +3,6 @@ CFLAGS=-march=rv32i -mabi=ilp32 -ffreestanding -nostdlib -O2 -Wall
 LFLAGS=-Wl,--build-id=none,-Bstatic,-T,link.ld,--strip-debug
 VFILES=Hazard2_SoC.f
 TBFILES=Hazard2_SoC_tb.v
-SRC_FILE = test.c
 
 # Rule for simulation using iverilog
 sim: test.vvp
@@ -19,8 +18,8 @@ test.hex: test.elf
 	$(CROSS)objcopy --verilog-data-width=4 -O verilog test.elf test.hex
 
 # Compile the C code into a RISC-V ELF executable
-test.elf: link.ld crt.s $(SRC_FILE)
-	$(CROSS)gcc $(CFLAGS) $(LFLAGS) -o test.elf crt.s $(SRC_FILE)
+test.elf: link.ld crt.s test.c
+	$(CROSS)gcc $(CFLAGS) $(LFLAGS) -o test.elf crt.s test.c
 
 # A pseudo target to ensure hex files are generated before simulation
 hex: test.hex
@@ -30,4 +29,12 @@ all: sim
 
 # Clean up generated files
 clean:
-	rm -f *.elf *.hex *.vvp *.asm
+	rm -f *.elf *.hex *.vvp *.asm *.o
+
+
+runass: 
+	$(CROSS)as -o test.o test.s
+	$(CROSS)ld -o test.elf test.o 
+	$(CROSS)objcopy --verilog-data-width=4 -O verilog test.elf test.hex
+	iverilog -f $(VFILES) -o test.vvp $(TBFILES)
+	vvp test.vvp
