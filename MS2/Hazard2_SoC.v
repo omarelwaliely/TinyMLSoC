@@ -63,17 +63,13 @@ module Hazard2_SoC (
         .GPIO_OE(GPIO_OE)
     );
 
-    ahbl_ram #(.SIZE(8*1024)) PMEM (
+    ahbl_rom #(.SIZE(8*1024)) PMEM (
         .HCLK(HCLK),
         .HRESETn(HRESETn),
 
         .HADDR(HADDR),
-        .HTRANS(HTRANS),
-        .HSIZE(HSIZE),
-        .HWRITE(HWRITE),
         .HREADY(HREADY),
         .HSEL(S0_HSEL),
-        .HWDATA(HWDATA),
         .HREADYOUT(S0_HREADYOUT),
         .HRDATA(S0_HRDATA)
     );
