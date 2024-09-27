@@ -1,0 +1,717 @@
+$date
+	Sun Sep 22 05:06:29 2024
+$end
+$version
+	Icarus Verilog
+$end
+$timescale
+	1s
+$end
+$scope module SoC_with_3_slaves $end
+$var wire 1 ! HCLK $end
+$var wire 1 " HRESETn $end
+$var wire 1 # S0_HREADYOUT $end
+$var wire 1 $ S1_HREADYOUT $end
+$var wire 1 % S2_HREADYOUT $end
+$var wire 1 & S2_HSEL $end
+$var wire 32 ' S2_HRDATA [31:0] $end
+$var wire 1 ( S1_HSEL $end
+$var wire 32 ) S1_HRDATA [31:0] $end
+$var wire 32 * S0_REGISTER_2 [31:0] $end
+$var wire 32 + S0_REGISTER_1 [31:0] $end
+$var wire 32 , S0_REGISTER_0 [31:0] $end
+$var wire 1 - S0_HSEL $end
+$var wire 32 . S0_HRDATA [31:0] $end
+$var wire 1 / HWRITE $end
+$var wire 32 0 HWDATA [31:0] $end
+$var wire 2 1 HTRANS [1:0] $end
+$var wire 3 2 HSIZE [2:0] $end
+$var wire 1 3 HREADY $end
+$var wire 32 4 HRDATA [31:0] $end
+$var wire 32 5 HADDR [31:0] $end
+$scope module M $end
+$var wire 1 ! HCLK $end
+$var wire 1 " HRESETn $end
+$var wire 1 3 HREADY $end
+$var wire 32 6 HRDATA [31:0] $end
+$var reg 32 7 HADDR [31:0] $end
+$var reg 3 8 HSIZE [2:0] $end
+$var reg 2 9 HTRANS [1:0] $end
+$var reg 32 : HWDATA [31:0] $end
+$var reg 1 / HWRITE $end
+$scope task ahbl_read $end
+$var reg 32 ; addr [31:0] $end
+$var reg 3 < size [2:0] $end
+$upscope $end
+$scope task ahbl_w_write $end
+$var reg 32 = addr [31:0] $end
+$var reg 32 > data [31:0] $end
+$var reg 3 ? size [2:0] $end
+$upscope $end
+$upscope $end
+$scope module S $end
+$var wire 32 @ HADDR [31:0] $end
+$var wire 1 ! HCLK $end
+$var wire 1 " HRESETn $end
+$var wire 2 A HTRANS [1:0] $end
+$var wire 1 # S0_HREADYOUT $end
+$var wire 1 $ S1_HREADYOUT $end
+$var wire 1 % S2_HREADYOUT $end
+$var wire 1 & S2_HSEL $end
+$var wire 32 B S2_HRDATA [31:0] $end
+$var wire 1 ( S1_HSEL $end
+$var wire 32 C S1_HRDATA [31:0] $end
+$var wire 1 - S0_HSEL $end
+$var wire 32 D S0_HRDATA [31:0] $end
+$var wire 1 3 HREADY $end
+$var wire 32 E HRDATA [31:0] $end
+$var parameter 32 F S0 $end
+$var parameter 32 G S1 $end
+$var parameter 32 H S2 $end
+$var reg 3 I sel [2:0] $end
+$var reg 3 J sel_d [2:0] $end
+$upscope $end
+$scope module S0 $end
+$var wire 32 K HADDR [31:0] $end
+$var wire 1 ! HCLK $end
+$var wire 1 3 HREADY $end
+$var wire 1 # HREADYOUT $end
+$var wire 1 " HRESETn $end
+$var wire 1 - HSEL $end
+$var wire 3 L HSIZE [2:0] $end
+$var wire 2 M HTRANS [1:0] $end
+$var wire 32 N HWDATA [31:0] $end
+$var wire 1 / HWRITE $end
+$var wire 1 O ahbl_read $end
+$var wire 1 P ahbl_we $end
+$var wire 32 Q register_2_output [31:0] $end
+$var wire 32 R register_1_output [31:0] $end
+$var wire 32 S register_0_output [31:0] $end
+$var parameter 32 T ID $end
+$var reg 32 U HADDR_d [31:0] $end
+$var reg 32 V HRDATA [31:0] $end
+$var reg 1 W HSEL_d $end
+$var reg 3 X HSIZE_d [2:0] $end
+$var reg 2 Y HTRANS_d [1:0] $end
+$var reg 1 Z HWRITE_d $end
+$var reg 3 [ load [2:0] $end
+$scope module register_0 $end
+$var wire 32 \ D [31:0] $end
+$var wire 1 ! clk $end
+$var wire 1 ] load $end
+$var wire 1 " rst_n $end
+$var parameter 32 ^ n $end
+$var reg 32 _ Q [31:0] $end
+$upscope $end
+$scope module register_1 $end
+$var wire 32 ` D [31:0] $end
+$var wire 1 ! clk $end
+$var wire 1 a load $end
+$var wire 1 " rst_n $end
+$var parameter 32 b n $end
+$var reg 32 c Q [31:0] $end
+$upscope $end
+$scope module register_2 $end
+$var wire 32 d D [31:0] $end
+$var wire 1 ! clk $end
+$var wire 1 e load $end
+$var wire 1 " rst_n $end
+$var parameter 32 f n $end
+$var reg 32 g Q [31:0] $end
+$upscope $end
+$upscope $end
+$scope module S1 $end
+$var wire 32 h HADDR [31:0] $end
+$var wire 1 ! HCLK $end
+$var wire 1 3 HREADY $end
+$var wire 1 $ HREADYOUT $end
+$var wire 1 " HRESETn $end
+$var wire 1 ( HSEL $end
+$var wire 3 i HSIZE [2:0] $end
+$var wire 2 j HTRANS [1:0] $end
+$var wire 32 k HWDATA [31:0] $end
+$var wire 1 / HWRITE $end
+$var wire 1 l ahbl_rd $end
+$var wire 1 m ahbl_we $end
+$var parameter 32 n ID $end
+$var reg 32 o HADDR_d [31:0] $end
+$var reg 32 p HRDATA [31:0] $end
+$var reg 1 q HSEL_d $end
+$var reg 3 r HSIZE_d [2:0] $end
+$var reg 2 s HTRANS_d [1:0] $end
+$var reg 1 t HWRITE_d $end
+$upscope $end
+$scope module S2 $end
+$var wire 32 u HADDR [31:0] $end
+$var wire 1 ! HCLK $end
+$var wire 1 3 HREADY $end
+$var wire 1 % HREADYOUT $end
+$var wire 1 " HRESETn $end
+$var wire 1 & HSEL $end
+$var wire 3 v HSIZE [2:0] $end
+$var wire 2 w HTRANS [1:0] $end
+$var wire 32 x HWDATA [31:0] $end
+$var wire 1 / HWRITE $end
+$var wire 1 y ahbl_rd $end
+$var wire 1 z ahbl_we $end
+$var parameter 32 { ID $end
+$var reg 32 | HADDR_d [31:0] $end
+$var reg 32 } HRDATA [31:0] $end
+$var reg 1 ~ HSEL_d $end
+$var reg 3 !" HSIZE_d [2:0] $end
+$var reg 2 "" HTRANS_d [1:0] $end
+$var reg 1 #" HWRITE_d $end
+$upscope $end
+$upscope $end
+$scope module ahbl_master_tb $end
+$var wire 1 $" HWRITE $end
+$var wire 32 %" HWDATA [31:0] $end
+$var wire 2 &" HTRANS [1:0] $end
+$var wire 3 '" HSIZE [2:0] $end
+$var wire 32 (" HADDR [31:0] $end
+$var reg 1 )" HCLK $end
+$var reg 32 *" HRDATA [31:0] $end
+$var reg 1 +" HREADY $end
+$var reg 1 ," HRESETn $end
+$scope module MASTER $end
+$var wire 1 )" HCLK $end
+$var wire 32 -" HRDATA [31:0] $end
+$var wire 1 +" HREADY $end
+$var wire 1 ," HRESETn $end
+$var reg 32 ." HADDR [31:0] $end
+$var reg 3 /" HSIZE [2:0] $end
+$var reg 2 0" HTRANS [1:0] $end
+$var reg 32 1" HWDATA [31:0] $end
+$var reg 1 $" HWRITE $end
+$scope task ahbl_read $end
+$var reg 32 2" addr [31:0] $end
+$var reg 3 3" size [2:0] $end
+$upscope $end
+$scope task ahbl_w_write $end
+$var reg 32 4" addr [31:0] $end
+$var reg 32 5" data [31:0] $end
+$var reg 3 6" size [2:0] $end
+$upscope $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+$comment Show the parameter values. $end
+$dumpall
+b10101011110011011110111100000010 {
+b10101011110011011110111100000001 n
+b100000 f
+b100000 b
+b100000 ^
+b10101011110011011110111100000000 T
+b100000xxxxxxxxxxxxxxxxxxxxxxxx H
+b0xxxxxxxxxxxxxxxxxxxxxxxx G
+b1000000xxxxxxxxxxxxxxxxxxxxxxxx F
+$end
+#0
+$dumpvars
+bx 6"
+bx 5"
+bx 4"
+bx 3"
+bx 2"
+bx 1"
+bx 0"
+bx /"
+bx ."
+b10111010110111011011111011101111 -"
+0,"
+1+"
+b10111010110111011011111011101111 *"
+0)"
+bx ("
+bx '"
+bx &"
+bx %"
+x$"
+x#"
+bx ""
+bx !"
+x~
+bx }
+bx |
+xz
+xy
+bx x
+bx w
+bx v
+bx u
+xt
+bx s
+bx r
+xq
+bx p
+bx o
+xm
+xl
+bx k
+bx j
+bx i
+bx h
+bx g
+xe
+bx d
+bx c
+xa
+bx `
+bx _
+x]
+bx \
+bx [
+xZ
+bx Y
+bx X
+xW
+bx V
+bx U
+bx S
+bx R
+bx Q
+xP
+xO
+bx N
+bx M
+bx L
+bx K
+bx J
+bx I
+bx E
+bx D
+bx C
+bx B
+bx A
+bx @
+bx ?
+bx >
+bx =
+bx <
+bx ;
+bx :
+bx 9
+bx 8
+bx 7
+bx 6
+bx 5
+bx 4
+13
+bx 2
+bx 1
+bx 0
+x/
+bx .
+x-
+bx ,
+bx +
+bx *
+bx )
+x(
+bx '
+x&
+1%
+1$
+1#
+z"
+z!
+$end
+#5
+1)"
+#10
+0)"
+#15
+1)"
+#20
+0)"
+#25
+1)"
+#30
+0)"
+#35
+1)"
+#40
+0)"
+#45
+1)"
+#50
+0)"
+#55
+1)"
+#60
+0)"
+#65
+1)"
+#70
+0)"
+#75
+1)"
+#80
+0)"
+#85
+1)"
+#90
+0)"
+#95
+1)"
+#100
+0)"
+#105
+b10 6"
+b1 5"
+b1000000000000000000000000000001 4"
+1,"
+1)"
+#110
+0)"
+#115
+1)"
+#116
+1$"
+b10 '"
+b10 /"
+b1000000000000000000000000000001 ("
+b1000000000000000000000000000001 ."
+b10 &"
+b10 0"
+#120
+0)"
+#125
+b0 &"
+b0 0"
+b1 %"
+b1 1"
+1)"
+#127
+b10 5"
+b1000000000000000000000000000010 4"
+#130
+0)"
+#135
+1)"
+#136
+b1000000000000000000000000000010 ("
+b1000000000000000000000000000010 ."
+b10 &"
+b10 0"
+#140
+0)"
+#145
+b0 &"
+b0 0"
+b10 %"
+b10 1"
+1)"
+#150
+0)"
+#155
+1)"
+#160
+0)"
+#165
+1)"
+#170
+0)"
+#175
+1)"
+#180
+0)"
+#185
+1)"
+#190
+0)"
+#195
+1)"
+#200
+0)"
+#205
+1)"
+#210
+0)"
+#215
+1)"
+#220
+0)"
+#225
+1)"
+#230
+0)"
+#235
+1)"
+#240
+0)"
+#245
+1)"
+#247
+b10 3"
+b1000000000000000000000000000011 2"
+#250
+0)"
+#255
+1)"
+#256
+0$"
+b1000000000000000000000000000011 ("
+b1000000000000000000000000000011 ."
+b10 &"
+b10 0"
+#260
+0)"
+#265
+b0 &"
+b0 0"
+1)"
+#270
+0)"
+#275
+1)"
+#280
+0)"
+#281
+b1000000000000000000000000000010 2"
+#285
+1)"
+#286
+b1000000000000000000000000000010 ("
+b1000000000000000000000000000010 ."
+b10 &"
+b10 0"
+#290
+0)"
+#295
+b0 &"
+b0 0"
+1)"
+#300
+0)"
+#305
+1)"
+#310
+0)"
+#315
+1)"
+#320
+0)"
+#325
+1)"
+#330
+0)"
+#335
+1)"
+#340
+0)"
+#345
+1)"
+#350
+0)"
+#355
+1)"
+#360
+0)"
+#365
+1)"
+#370
+0)"
+#375
+1)"
+#380
+0)"
+#385
+1)"
+#390
+0)"
+#395
+1)"
+#400
+0)"
+#405
+1)"
+#410
+0)"
+#411
+b11 5"
+b1 4"
+#415
+1)"
+#416
+1$"
+b1 ("
+b1 ."
+b10 &"
+b10 0"
+#420
+0)"
+#425
+b0 &"
+b0 0"
+b11 %"
+b11 1"
+1)"
+#427
+b100 5"
+b100000000000000000000000000010 4"
+#430
+0)"
+#435
+1)"
+#436
+b100000000000000000000000000010 ("
+b100000000000000000000000000010 ."
+b10 &"
+b10 0"
+#440
+0)"
+#445
+b0 &"
+b0 0"
+b100 %"
+b100 1"
+1)"
+#450
+0)"
+#455
+1)"
+#460
+0)"
+#465
+1)"
+#470
+0)"
+#475
+1)"
+#480
+0)"
+#485
+1)"
+#490
+0)"
+#495
+1)"
+#500
+0)"
+#505
+1)"
+#510
+0)"
+#515
+1)"
+#520
+0)"
+#525
+1)"
+#530
+0)"
+#535
+1)"
+#540
+0)"
+#545
+1)"
+#547
+b1 2"
+#550
+0)"
+#555
+1)"
+#556
+0$"
+b1 ("
+b1 ."
+b10 &"
+b10 0"
+#560
+0)"
+#565
+b0 &"
+b0 0"
+1)"
+#570
+0)"
+#575
+1)"
+#580
+0)"
+#581
+b100000000000000000000000000010 2"
+#585
+1)"
+#586
+b100000000000000000000000000010 ("
+b100000000000000000000000000010 ."
+b10 &"
+b10 0"
+#590
+0)"
+#595
+b0 &"
+b0 0"
+1)"
+#600
+0)"
+#605
+1)"
+#610
+0)"
+#611
+b100000000000000000000100000001 2"
+#615
+1)"
+#616
+b100000000000000000000100000001 ("
+b100000000000000000000100000001 ."
+b10 &"
+b10 0"
+#620
+0)"
+#625
+b0 &"
+b0 0"
+1)"
+#630
+0)"
+#635
+1)"
+#640
+0)"
+#645
+1)"
+#650
+0)"
+#655
+1)"
+#660
+0)"
+#665
+1)"
+#670
+0)"
+#675
+1)"
+#680
+0)"
+#685
+1)"
+#690
+0)"
+#695
+1)"
+#700
+0)"
+#705
+1)"
+#710
+0)"
+#715
+1)"
+#720
+0)"
+#725
+1)"
+#730
+0)"
+#735
+1)"
+#740
+0)"
+#741
