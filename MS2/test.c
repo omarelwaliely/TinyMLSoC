@@ -7,7 +7,7 @@ int main(){
     // configure the GPIO as an output
     *gpio_oe = 0xFFFFFFFF;
     // output something
-    *gpio_data = 0xF00FE000;
+    *gpio_data = 0xF00FE00E; //0xF00FE000;
     *test = 0xF00FE003;
     return 0;
 }
