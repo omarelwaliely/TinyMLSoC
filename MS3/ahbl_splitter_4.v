@@ -49,7 +49,7 @@ module ahbl_splitter_4 #(parameter  S0=5'h0,
     reg [5:0] sel;
     reg [5:0] sel_d;
     always @*
-        case(HADDR[31:28])
+        case(HADDR[31:27])
             S0: sel = 5'b00001;
             S1: sel = 5'b00010;
             S2: sel = 5'b00100;
