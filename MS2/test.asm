@@ -38,11 +38,11 @@ Disassembly of section .text:
   78:	00000f13          	li	t5,0
   7c:	00000f93          	li	t6,0
   80:	00000517          	auipc	a0,0x0
-  84:	09050513          	addi	a0,a0,144 # 110 <_sidata>
+  84:	09450513          	addi	a0,a0,148 # 114 <_sidata>
   88:	20000597          	auipc	a1,0x20000
   8c:	f7858593          	addi	a1,a1,-136 # 20000000 <test>
   90:	20000617          	auipc	a2,0x20000
-  94:	f7c60613          	addi	a2,a2,-132 # 2000000c <_ebss>
+  94:	f7c60613          	addi	a2,a2,-132 # 2000000c <_edata>
   98:	00c5dc63          	bge	a1,a2,b0 <end_init_data>
 
 0000009c <loop_init_data>:
@@ -54,9 +54,9 @@ Disassembly of section .text:
 
 000000b0 <end_init_data>:
   b0:	20000517          	auipc	a0,0x20000
-  b4:	f5c50513          	addi	a0,a0,-164 # 2000000c <_ebss>
+  b4:	f5c50513          	addi	a0,a0,-164 # 2000000c <_edata>
   b8:	20000597          	auipc	a1,0x20000
-  bc:	f5458593          	addi	a1,a1,-172 # 2000000c <_ebss>
+  bc:	f5458593          	addi	a1,a1,-172 # 2000000c <_edata>
   c0:	00b55863          	bge	a0,a1,d0 <end_init_bss>
 
 000000c4 <loop_init_bss>:
@@ -72,19 +72,20 @@ Disassembly of section .text:
 
 000000d8 <main>:
   d8:	200007b7          	lui	a5,0x20000
-  dc:	0047a783          	lw	a5,4(a5) # 20000004 <gpio_oe>
-  e0:	20000737          	lui	a4,0x20000
-  e4:	00872683          	lw	a3,8(a4) # 20000008 <gpio_data>
+  dc:	0047a603          	lw	a2,4(a5) # 20000004 <gpio_oe>
+  e0:	200007b7          	lui	a5,0x20000
+  e4:	0087a683          	lw	a3,8(a5) # 20000008 <gpio_data>
   e8:	20000737          	lui	a4,0x20000
   ec:	00072703          	lw	a4,0(a4) # 20000000 <test>
-  f0:	fff00613          	li	a2,-1
-  f4:	00c7a023          	sw	a2,0(a5)
-  f8:	f00fe7b7          	lui	a5,0xf00fe
-  fc:	00f6a023          	sw	a5,0(a3)
- 100:	00378793          	addi	a5,a5,3 # f00fe003 <_stack+0xd00fc003>
- 104:	00f72023          	sw	a5,0(a4)
- 108:	00000513          	li	a0,0
- 10c:	00008067          	ret
+  f0:	f00fe7b7          	lui	a5,0xf00fe
+  f4:	fff00593          	li	a1,-1
+  f8:	00b62023          	sw	a1,0(a2)
+  fc:	00e78613          	addi	a2,a5,14 # f00fe00e <_stack+0xd00fc00e>
+ 100:	00c6a023          	sw	a2,0(a3)
+ 104:	00378793          	addi	a5,a5,3
+ 108:	00f72023          	sw	a5,0(a4)
+ 10c:	00000513          	li	a0,0
+ 110:	00008067          	ret
 
 Disassembly of section .data:
 
@@ -122,8 +123,17 @@ Disassembly of section .comment:
 00000000 <.comment>:
    0:	3a434347          	fmsub.d	ft6,ft6,ft4,ft7,rmm
    4:	2820                	fld	fs0,80(s0)
-   6:	2029                	jal	10 <start+0x10>
-   8:	3031                	jal	fffff814 <_stack+0xdfffd814>
-   a:	322e                	fld	ft4,232(sp)
-   c:	302e                	fld	ft0,232(sp)
-	...
+   6:	69466953          	0x69466953
+   a:	6576                	flw	fa0,92(sp)
+   c:	4720                	lw	s0,72(a4)
+   e:	38204343          	fmadd.s	ft6,ft0,ft2,ft7,rmm
+  12:	332e                	fld	ft6,232(sp)
+  14:	302e                	fld	ft0,232(sp)
+  16:	322d                	jal	fffff940 <_stack+0xdfffd940>
+  18:	3130                	fld	fa2,96(a0)
+  1a:	2e39                	jal	338 <_sidata+0x224>
+  1c:	3830                	fld	fa2,112(s0)
+  1e:	302e                	fld	ft0,232(sp)
+  20:	2029                	jal	2a <start+0x2a>
+  22:	2e38                	fld	fa4,88(a2)
+  24:	00302e33          	sgtz	t3,gp

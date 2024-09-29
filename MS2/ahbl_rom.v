@@ -1,4 +1,4 @@
-module ahbl_ram (
+module ahbl_rom (
     input   wire        HCLK,
     input   wire        HRESETn,
 
