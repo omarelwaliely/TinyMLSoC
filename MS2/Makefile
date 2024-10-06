@@ -1,11 +1,16 @@
 CROSS=riscv64-unknown-elf-
-CFLAGS=-march=rv32i -mabi=ilp32 -ffreestanding -nostdlib -O2 -Wall
+CFLAGS=-march=rv32i -mabi=ilp32 -ffreestanding -nostdlib -O2 -Wall 
 LFLAGS=-Wl,--build-id=none,-Bstatic,-T,link.ld,--strip-debug
 VFILES=Hazard2_SoC.f
 TBFILES=Hazard2_SoC_tb.v
 
 # Rule for simulation using iverilog
+
 sim: test.vvp
+	vvp test.vvp
+
+simhex: 
+	iverilog -f $(VFILES) -o test.vvp $(TBFILES)
 	vvp test.vvp
 
 # Compile Verilog files and testbench into a vvp file for simulation
@@ -34,7 +39,6 @@ clean:
 
 runass: 
 	$(CROSS)as -o test.o test.s
-	$(CROSS)ld -o test.elf test.o 
 	$(CROSS)objcopy --verilog-data-width=4 -O verilog test.elf test.hex
 	iverilog -f $(VFILES) -o test.vvp $(TBFILES)
 	vvp test.vvp
