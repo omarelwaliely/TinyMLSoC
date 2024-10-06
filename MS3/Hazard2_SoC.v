@@ -39,9 +39,20 @@ module Hazard2_SoC (
     wire        HREADY;
     wire [31:0] HRDATA;
 
+    //SPLITTER SLAVE WIRES
+
     wire [31:0] S0_HRDATA, S1_HRDATA, S2_HRDATA, S3_HRDATA, S4_HRDATA;
     wire        S0_HSEL, S1_HSEL, S2_HSEL, S3_HSEL, S4_HSEL;
     wire        S0_HREADYOUT, S1_HREADYOUT, S2_HREADYOUT, S3_HREADYOUT, S4_HREADYOUT;
+
+    //GPIO SLAVE WIRES
+
+    wire [31:0] A_HRDATA, B_HRDATA, C_HRDATA;
+    wire        A_SEL, B_SEL, C_SEL;
+    wire        A_HREADYOUT, B_HREADYOUT, C_HREADYOUT;
+
+
+    //ISTANTIATIONS
 
     Hazard2 CPU (
         .HCLK(HCLK),
@@ -56,24 +67,7 @@ module Hazard2_SoC (
         .HRDATA(HRDATA)
     );
 
-    ahbl_gpio GPIO_A (
-        .HCLK(HCLK),
-        .HRESETn(HRESETn),
-
-        .HADDR(HADDR),
-        .HTRANS(HTRANS),
-        .HSIZE(HSIZE),
-        .HWRITE(HWRITE),
-        .HREADY(HREADY),
-        .HSEL(S2_HSEL),
-        .HWDATA(HWDATA),
-        .HREADYOUT(S2_HREADYOUT),
-        .HRDATA(S2_HRDATA),
-
-        .GPIO_IN(GPIO_IN_A),
-        .GPIO_OUT(GPIO_OUT_A),
-        .GPIO_OE(GPIO_OE_A)
-    );
+    //memory
     
 
     ahbl_rom #(.SIZE(8*1024)) PMEM (
@@ -102,6 +96,29 @@ module Hazard2_SoC (
         .HRDATA(S1_HRDATA)
     );
 
+
+    //GPIOS
+
+    ahbl_gpio GPIO_A (
+        .HCLK(HCLK),
+        .HRESETn(HRESETn),
+
+        .HADDR(HADDR),
+        .HTRANS(HTRANS),
+        .HSIZE(HSIZE),
+        .HWRITE(HWRITE),
+        .HREADY(HREADY),
+        .HSEL(A_SEL),
+        .HWDATA(HWDATA),
+        .HREADYOUT(A_HREADYOUT),
+        .HRDATA(A_HRDATA),
+
+        .GPIO_IN(GPIO_IN_A),
+        .GPIO_OUT(GPIO_OUT_A),
+        .GPIO_OE(GPIO_OE_A)
+    );
+
+
     ahbl_gpio GPIO_B (
         .HCLK(HCLK),
         .HRESETn(HRESETn),
@@ -111,10 +128,10 @@ module Hazard2_SoC (
         .HSIZE(HSIZE),
         .HWRITE(HWRITE),
         .HREADY(HREADY),
-        .HSEL(S3_HSEL),
+        .HSEL(B_SEL),
         .HWDATA(HWDATA),
-        .HREADYOUT(S3_HREADYOUT),
-        .HRDATA(S3_HRDATA),
+        .HREADYOUT(B_HREADYOUT),
+        .HRDATA(B_HRDATA),
 
         .GPIO_IN(GPIO_IN_B),
         .GPIO_OUT(GPIO_OUT_B),
@@ -130,22 +147,21 @@ module Hazard2_SoC (
         .HSIZE(HSIZE),
         .HWRITE(HWRITE),
         .HREADY(HREADY),
-        .HSEL(S4_HSEL),
+        .HSEL(C_SEL),
         .HWDATA(HWDATA),
-        .HREADYOUT(S4_HREADYOUT),
-        .HRDATA(S4_HRDATA),
+        .HREADYOUT(C_HREADYOUT),
+        .HRDATA(C_HRDATA),
 
         .GPIO_IN(GPIO_IN_C),
         .GPIO_OUT(GPIO_OUT_C),
         .GPIO_OE(GPIO_OE_C)
     );
-
+    //SPLITTERS
 
     ahbl_splitter # ( .S0(4'h0),     // Program Memory
                         .S1(4'h2),     // Data Memory
-                        .S2(4'h4),     // GPIO Port A
-                        .S3(4'h5),     // GPIO Port B
-                        .S4(4'h6)      // GPIO Port C
+                        .S2(4'h4),     // GPIO splitter
+                        .S3(4'h8) // nothing
     ) SPLITTER (
         .HCLK(HCLK),
         .HRESETn(HRESETn),
@@ -169,11 +185,35 @@ module Hazard2_SoC (
 
         .S3_HSEL(S3_HSEL),
         .S3_HRDATA(S3_HRDATA),
-        .S3_HREADYOUT(S3_HREADYOUT),
-
-        .S4_HSEL(S4_HSEL),
-        .S4_HRDATA(S4_HRDATA),
-        .S4_HREADYOUT(S4_HREADYOUT)
+        .S3_HREADYOUT(S3_HREADYOUT)
 
     );
+    ahbl_gpio_splitter #(.A(3'h0), 
+                        .B(3'h1),
+                        .C(3'h2)
+    ) GPIO_SPLITTER (
+        .HCLK(HCLK),
+        .HRESETn(HRESETn),
+
+        .HADDR(HADDR),
+        .HTRANS(HTRANS),
+        .HREADY(HREADY),
+        .HRDATA(S2_HRDATA),
+        .HSEL(S2_HSEL),
+        .HREADYOUT(S2_HREADYOUT),
+
+        .A_SEL(A_SEL),
+        .A_HRDATA(A_HRDATA),
+        .A_HREADYOUT(A_HREADYOUT),
+
+        .B_SEL(B_SEL),
+        .B_HRDATA(B_HRDATA),
+        .B_HREADYOUT(B_HREADYOUT),
+
+        .C_SEL(C_SEL),
+        .C_HRDATA(C_HRDATA),
+        .C_HREADYOUT(C_HREADYOUT)
+
+);
+
 endmodule
