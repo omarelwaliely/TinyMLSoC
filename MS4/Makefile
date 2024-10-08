@@ -56,4 +56,4 @@ icepacking:
 	icepack Hazard2_SoC.asc Hazard2_SoC.bin
 
 prog:
-	sudo iceprog Hazard2_SoC.bin
+	iceprog Hazard2_SoC.bin

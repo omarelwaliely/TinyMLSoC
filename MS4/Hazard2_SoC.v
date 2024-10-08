@@ -72,7 +72,7 @@ module Hazard2_SoC (
     
 
 
-    ahbl_rom #(.SIZE(8*128)) PMEM (
+    ahbl_rom #(.SIZE(8*1024)) PMEM (
         .HCLK(HCLK),
         .HRESETn(HRESETn),
 
@@ -83,7 +83,7 @@ module Hazard2_SoC (
         .HRDATA(S0_HRDATA)
     );
 
-    ahbl_ram #(.SIZE(8*128)) DMEM (
+    ahbl_ram #(.SIZE(8*640)) DMEM (
         .HCLK(HCLK),
         .HRESETn(HRESETn),
 
