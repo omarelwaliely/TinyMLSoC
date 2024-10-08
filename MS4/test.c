@@ -15,7 +15,7 @@ int main() {
 
 
     while (1) { 
-        *gpio_data_A= 0xFFF1;
+        *gpio_data_A= 0xFFFE;
         
     }
 

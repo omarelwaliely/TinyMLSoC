@@ -211,7 +211,7 @@ module Hazard2_SoC (
         .HREADYOUT(S2_HREADYOUT),
 
         .A_SEL(A_SEL),
-        .A_HRDATA(0),
+        .A_HRDATA(A_HRDATA),
         .A_HREADYOUT(1),
 
         .B_SEL(B_SEL),
