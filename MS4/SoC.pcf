@@ -1,6 +1,6 @@
 # 12 MHz clock
-set_io -nowarn HCLK        35
-set_frequency HCLK 6
+set_io -nowarn CLK        35
+set_frequency CLK 6
 
 # RS232
 set_io -nowarn RX          6

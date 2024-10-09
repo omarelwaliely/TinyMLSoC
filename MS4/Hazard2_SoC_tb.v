@@ -10,12 +10,12 @@ module Hazard2_SoC_tb;
     always #5 HCLK = ~HCLK;
 
     // Reset
-    // initial begin
-    //     HRESETn = 0;
-    //     #47;
-    //     @(posedge HCLK);
-    //     HRESETn = 1;
-    // end
+    initial begin
+        HRESETn = 0;
+        #47;
+        @(posedge HCLK);
+        HRESETn = 1;
+    end
 
     // TB infrastructure
     initial begin
@@ -28,7 +28,7 @@ module Hazard2_SoC_tb;
 
     Hazard2_SoC MUV (
         .HCLK(HCLK),
-        // .HRESETn(HRESETn),
+        .HRESETn(HRESETn),
         .LED_out(LED_out)
     );
 

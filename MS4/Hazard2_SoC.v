@@ -14,8 +14,9 @@
 
 module Hazard2_SoC (
     input wire          HCLK,
-    // input wire          HRESETn,
+    input wire          HRESETn,
     output wire [2:0]   LED_out
+    
     // output wire [31:0]  GPIO_OUT_A,
     // output wire [31:0]  GPIO_OE_A,
     // input wire [31:0]   GPIO_IN_A,
@@ -30,11 +31,10 @@ module Hazard2_SoC (
 
 
 );
-    wire          HRESETn;
+    //  wire          HRESETn;
     wire [31:0]  GPIO_OUT_A;
     wire [31:0]  GPIO_OE_A;
     wire [31:0]   GPIO_IN_A;
-
     wire [31:0] HADDR;
     wire [1:0]  HTRANS;
     wire [2:0] 	HSIZE;
@@ -59,9 +59,10 @@ module Hazard2_SoC (
     wire [31:0] A_HRDATA, B_HRDATA, C_HRDATA;
     wire        A_SEL, B_SEL, C_SEL;
     wire        A_HREADYOUT, B_HREADYOUT, C_HREADYOUT;
-
-    assign HRESETn = 1'b1;
+    // assign HRESETn = 1'b1;
     assign UARTDATA = {5'b00000, GPIO_OUT_A[2:0]}; 
+    assign LED_out = GPIO_OUT_A[2:0];
+    
     //ISTANTIATIONS
 
     Hazard2 CPU (
@@ -87,7 +88,7 @@ module Hazard2_SoC (
             .en(1'b1),               // Always enabled
             .start(UART_START),      // Start signal to transmit
             .data(UARTDATA),        // Data to send (RGB value)
-            .baud_div(16'd624),    // Baud rate divider (for 9600 baud @ 100 MHz)
+            .baud_div(16'd9),    // Baud rate divider (for 9600 baud @ 100 MHz)
             .tx(Tx),                 // UART TX output
             .done(UART_DONE)         // Done flag
         );
@@ -103,7 +104,7 @@ module Hazard2_SoC (
         .HRDATA(S0_HRDATA)
     );
 
-    ahbl_ram #(.SIZE(8*760)) DMEM (
+    ahbl_ram #(.SIZE(8*740)) DMEM (
         .HCLK(HCLK),
         .HRESETn(HRESETn),
 
@@ -140,11 +141,11 @@ module Hazard2_SoC (
         .GPIO_OE(GPIO_OE_A)
     );
     
-    light_control LC    (
-	.clk(HCLK),
-	.RGB_in(GPIO_OUT_A[2:0]),
-	.LED_RGB(LED_out)
-    );
+    // light_control LC    (
+	// .clk(HCLK),
+	// .RGB_in(GPIO_OUT_A[2:0]),
+	// .LED_RGB(LED_out)
+    // );
 
     
 
@@ -220,10 +221,10 @@ reg [2:0] previous_led_state;
             previous_led_state <= 3'b000;
         end else begin
             if (GPIO_OUT_A[2:0] != previous_led_state) begin
-                UART_START <= 1'b1;
+                UART_START <= 1'b0;
                 previous_led_state <= GPIO_OUT_A[2:0];
             end else begin
-                UART_START <= 1'b0;
+                UART_START <= 1'b1;
             end
         end
     end

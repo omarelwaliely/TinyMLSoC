@@ -57,9 +57,6 @@ module uart_tx(
 
     assign done = (bit_cntr == 'h0);
 
-    //dis wrong
-    assign tx = tx_reg[1];
-
-    //assign tx = tx_reg[0];
+    assign tx = tx_reg[0];
 
 endmodule
