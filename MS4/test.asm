@@ -38,11 +38,11 @@ Disassembly of section .text:
   78:	00000f13          	li	t5,0
   7c:	00000f93          	li	t6,0
   80:	00000517          	auipc	a0,0x0
-  84:	08450513          	add	a0,a0,132 # 104 <_sidata>
+  84:	0b850513          	add	a0,a0,184 # 138 <_sidata>
   88:	20000597          	auipc	a1,0x20000
-  8c:	f7858593          	add	a1,a1,-136 # 20000000 <gpio_oe_A>
+  8c:	f7858593          	add	a1,a1,-136 # 20000000 <count>
   90:	20000617          	auipc	a2,0x20000
-  94:	f7860613          	add	a2,a2,-136 # 20000008 <_ebss>
+  94:	f7c60613          	add	a2,a2,-132 # 2000000c <_ebss>
   98:	00c5dc63          	bge	a1,a2,b0 <end_init_data>
 
 0000009c <loop_init_data>:
@@ -54,9 +54,9 @@ Disassembly of section .text:
 
 000000b0 <end_init_data>:
   b0:	20000517          	auipc	a0,0x20000
-  b4:	f5850513          	add	a0,a0,-168 # 20000008 <_ebss>
+  b4:	f5c50513          	add	a0,a0,-164 # 2000000c <_ebss>
   b8:	20000597          	auipc	a1,0x20000
-  bc:	f5058593          	add	a1,a1,-176 # 20000008 <_ebss>
+  bc:	f5458593          	add	a1,a1,-172 # 2000000c <_ebss>
   c0:	00b55863          	bge	a0,a1,d0 <end_init_bss>
 
 000000c4 <loop_init_bss>:
@@ -65,33 +65,52 @@ Disassembly of section .text:
   cc:	feb54ce3          	blt	a0,a1,c4 <loop_init_bss>
 
 000000d0 <end_init_bss>:
-  d0:	008000ef          	jal	d8 <main>
+  d0:	01c000ef          	jal	ec <main>
 
 000000d4 <loop>:
   d4:	0000006f          	j	d4 <loop>
 
-000000d8 <main>:
+000000d8 <delay>:
   d8:	200007b7          	lui	a5,0x20000
-  dc:	0007a783          	lw	a5,0(a5) # 20000000 <gpio_oe_A>
-  e0:	20000737          	lui	a4,0x20000
-  e4:	fff00693          	li	a3,-1
-  e8:	00472703          	lw	a4,4(a4) # 20000004 <gpio_data_A>
-  ec:	00d7a023          	sw	a3,0(a5)
-  f0:	000107b7          	lui	a5,0x10
-  f4:	fff78793          	add	a5,a5,-1 # ffff <_sidata+0xfefb>
-  f8:	00f72023          	sw	a5,0(a4)
-  fc:	00f72023          	sw	a5,0(a4)
- 100:	ff9ff06f          	j	f8 <main+0x20>
+  dc:	0007a703          	lw	a4,0(a5) # 20000000 <count>
+  e0:	00070463          	beqz	a4,e8 <delay+0x10>
+  e4:	0007a023          	sw	zero,0(a5)
+  e8:	00008067          	ret
+
+000000ec <main>:
+  ec:	200007b7          	lui	a5,0x20000
+  f0:	0047a783          	lw	a5,4(a5) # 20000004 <gpio_oe_A>
+  f4:	20000737          	lui	a4,0x20000
+  f8:	00872603          	lw	a2,8(a4) # 20000008 <gpio_data_A>
+  fc:	fff00713          	li	a4,-1
+ 100:	00e7a023          	sw	a4,0(a5)
+ 104:	00010737          	lui	a4,0x10
+ 108:	fff70713          	add	a4,a4,-1 # ffff <_sidata+0xfec7>
+ 10c:	200007b7          	lui	a5,0x20000
+ 110:	000105b7          	lui	a1,0x10
+ 114:	00777693          	and	a3,a4,7
+ 118:	00171713          	sll	a4,a4,0x1
+ 11c:	00069463          	bnez	a3,124 <main+0x38>
+ 120:	fff58713          	add	a4,a1,-1 # ffff <_sidata+0xfec7>
+ 124:	00e62023          	sw	a4,0(a2)
+ 128:	0007a683          	lw	a3,0(a5) # 20000000 <count>
+ 12c:	fe0684e3          	beqz	a3,114 <main+0x28>
+ 130:	0007a023          	sw	zero,0(a5)
+ 134:	fe1ff06f          	j	114 <main+0x28>
 
 Disassembly of section .data:
 
-20000000 <gpio_oe_A>:
-20000000:	0004                	.insn	2, 0x0004
-20000002:	4000                	.insn	2, 0x4000
+20000000 <count>:
+20000000:	a120                	.insn	2, 0xa120
+20000002:	          	.insn	4, 0x00040007
 
-20000004 <gpio_data_A>:
-20000004:	0000                	.insn	2, 0x
+20000004 <gpio_oe_A>:
+20000004:	0004                	.insn	2, 0x0004
 20000006:	4000                	.insn	2, 0x4000
+
+20000008 <gpio_data_A>:
+20000008:	0000                	.insn	2, 0x
+2000000a:	4000                	.insn	2, 0x4000
 
 Disassembly of section .riscv.attributes:
 

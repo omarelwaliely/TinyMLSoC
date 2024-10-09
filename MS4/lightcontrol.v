@@ -8,29 +8,18 @@
  * vim: ts=4 sw=4
  */
 
+`default_nettype none
+
 module light_control (
 	input clk,
 	input [2:0] RGB_in,
 	output wire [2:0] LED_RGB
 );
 
-	// wire rgb_pwm[2:0];
-	// wire clk;
-
-	// SB_HFOSC osc_I (
-	// 	.CLKHFPU(1'b1),
-	// 	.CLKHFEN(1'b1),
-	// 	.CLKHF(clk,
-	// );
-
-	// always @(posedge clk)
-	// 	cnt <= cnt + 1;
-
-	//assign rgb_pwm[0] = cnt[25] & (cnt[0] == 1'b0);
 
 	SB_RGBA_DRV #(
 		.CURRENT_MODE("0b1"),
-		.RGB0_CURRENT("0b000000"),
+		.RGB0_CURRENT("0b000111"),
 		.RGB1_CURRENT("0b000111"),
 		.RGB2_CURRENT("0b000111")
 	) rgb_drv_I (
