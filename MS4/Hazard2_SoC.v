@@ -55,7 +55,6 @@ module Hazard2_SoC (
     wire        A_SEL, B_SEL, C_SEL;
     wire        A_HREADYOUT, B_HREADYOUT, C_HREADYOUT;
 
-    assign HRESETn = 1'b1;
 
     //ISTANTIATIONS
 
@@ -128,10 +127,6 @@ module Hazard2_SoC (
 	.RGB_in(GPIO_OUT_A[2:0]),
 	.LED_RGB(LED_out)
     );
-
-
-
-   
     //SPLITTERS
 
     ahbl_splitter # ( .S0(4'h0),     // Program Memory

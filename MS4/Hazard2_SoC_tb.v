@@ -1,7 +1,6 @@
 module Hazard2_SoC_tb;
     reg         HCLK;
     reg         HRESETn;
-
     wire [2:0] LED_out;
 
     
