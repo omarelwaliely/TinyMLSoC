@@ -1,15 +1,10 @@
 CROSS=riscv64-unknown-elf-
-CFLAGS=-march=rv32i -mabi=ilp32 -ffreestanding -nostdlib -O2 -Wall 
+CFLAGS=-march=rv32im -mabi=ilp32 -ffreestanding -nostdlib -O2 -Wall 
 LFLAGS=-Wl,--build-id=none,-Bstatic,-T,link.ld,--strip-debug
 VFILES=Hazard2_SoC.f
 TBFILES=Hazard2_SoC_tb.v
 
 # Rule for simulation using iverilog
-
-
-UART: 
-	iverilog -f $(VFILES) -o test.vvp $(uart_tx_rx_tb.v.v)
-	vvp test.vvp
 
 sim: test.vvp
 	vvp test.vvp
@@ -47,3 +42,18 @@ runass:
 	$(CROSS)objcopy --verilog-data-width=4 -O verilog test.elf test.hex
 	iverilog -f $(VFILES) -o test.vvp $(TBFILES)
 	vvp test.vvp
+
+runfpga: yosysfpga routing icepacking prog
+
+
+yosysfpga: 
+	yosys -p "synth_ice40 -top Hazard2_SoC -json Hazard2_SoC.json" Hazard2_SoC.v hazard2_cpu.v Hazard2.v ahbl_splitter.v ahbl_gpio_splitter.v ahbl_ram.v ahbl_rom.v ahbl_gpio.v lightcontrol.v
+
+routing:
+	nextpnr-ice40 --up5k  --package sg48 --json Hazard2_SoC.json --asc Hazard2_SoC.asc --pcf  SoC.pcf --pcf-allow-unconstrained
+
+icepacking:
+	icepack Hazard2_SoC.asc Hazard2_SoC.bin
+
+prog:
+	iceprog Hazard2_SoC.bin

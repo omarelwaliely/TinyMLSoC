@@ -14,22 +14,26 @@
 
 module Hazard2_SoC (
     input wire          HCLK,
-    input wire          HRESETn,
+    // input wire          HRESETn,
+    output wire [2:0]   LED_out
+    // output wire [31:0]  GPIO_OUT_A,
+    // output wire [31:0]  GPIO_OE_A,
+    // input wire [31:0]   GPIO_IN_A,
 
-    output wire [31:0]  GPIO_OUT_A,
-    output wire [31:0]  GPIO_OE_A,
-    input wire [31:0]   GPIO_IN_A,
+    // output wire [31:0]  GPIO_OUT_B,
+    // output wire [31:0]  GPIO_OE_B,
+    // input wire [31:0]   GPIO_IN_B,
 
-    output wire [31:0]  GPIO_OUT_B,
-    output wire [31:0]  GPIO_OE_B,
-    input wire [31:0]   GPIO_IN_B,
-
-    output wire [31:0]  GPIO_OUT_C,
-    output wire [31:0]  GPIO_OE_C,
-    input wire [31:0]   GPIO_IN_C
+    // output wire [31:0]  GPIO_OUT_C,
+    // output wire [31:0]  GPIO_OE_C,
+    // input wire [31:0]   GPIO_IN_C
 
 
 );
+    wire          HRESETn;
+    wire [31:0]  GPIO_OUT_A;
+    wire [31:0]  GPIO_OE_A;
+    wire [31:0]   GPIO_IN_A;
 
     wire [31:0] HADDR;
     wire [1:0]  HTRANS;
@@ -81,7 +85,7 @@ module Hazard2_SoC (
         .HRDATA(S0_HRDATA)
     );
 
-    ahbl_ram #(.SIZE(8*1024)) DMEM (
+    ahbl_ram #(.SIZE(8*760)) DMEM (
         .HCLK(HCLK),
         .HRESETn(HRESETn),
 
@@ -117,44 +121,11 @@ module Hazard2_SoC (
         .GPIO_OUT(GPIO_OUT_A),
         .GPIO_OE(GPIO_OE_A)
     );
-
-
-    ahbl_gpio GPIO_B (
-        .HCLK(HCLK),
-        .HRESETn(HRESETn),
-
-        .HADDR(HADDR),
-        .HTRANS(HTRANS),
-        .HSIZE(HSIZE),
-        .HWRITE(HWRITE),
-        .HREADY(HREADY),
-        .HSEL(B_SEL),
-        .HWDATA(HWDATA),
-        .HREADYOUT(B_HREADYOUT),
-        .HRDATA(B_HRDATA),
-
-        .GPIO_IN(GPIO_IN_B),
-        .GPIO_OUT(GPIO_OUT_B),
-        .GPIO_OE(GPIO_OE_B)
-    );
-
-    ahbl_gpio GPIO_C (
-        .HCLK(HCLK),
-        .HRESETn(HRESETn),
-
-        .HADDR(HADDR),
-        .HTRANS(HTRANS),
-        .HSIZE(HSIZE),
-        .HWRITE(HWRITE),
-        .HREADY(HREADY),
-        .HSEL(C_SEL),
-        .HWDATA(HWDATA),
-        .HREADYOUT(C_HREADYOUT),
-        .HRDATA(C_HRDATA),
-
-        .GPIO_IN(GPIO_IN_C),
-        .GPIO_OUT(GPIO_OUT_C),
-        .GPIO_OE(GPIO_OE_C)
+    
+    light_control LC    (
+	.clk(HCLK),
+	.RGB_in(GPIO_OUT_A[2:0]),
+	.LED_RGB(LED_out)
     );
     //SPLITTERS
 
@@ -207,12 +178,12 @@ module Hazard2_SoC (
         .A_HREADYOUT(A_HREADYOUT),
 
         .B_SEL(B_SEL),
-        .B_HRDATA(B_HRDATA),
-        .B_HREADYOUT(B_HREADYOUT),
+        .B_HRDATA(0),
+        .B_HREADYOUT(1'b1),
 
         .C_SEL(C_SEL),
-        .C_HRDATA(C_HRDATA),
-        .C_HREADYOUT(C_HREADYOUT)
+        .C_HRDATA(0),
+        .C_HREADYOUT(1'b1)
 
 );
 

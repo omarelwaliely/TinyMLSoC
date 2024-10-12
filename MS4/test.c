@@ -1,28 +1,32 @@
 volatile unsigned int* gpio_data_A = (volatile unsigned int *) 0x40000000;
 volatile unsigned int* gpio_oe_A = (volatile unsigned int *) 0x40000004;
-volatile unsigned int* gpio_data_B = (volatile unsigned int *) 0x41000000;
-volatile unsigned int* gpio_oe_B = (volatile unsigned int *) 0x41000004;
-volatile unsigned int* gpio_data_C = (volatile unsigned int *) 0x42000000;
-volatile unsigned int* gpio_oe_C = (volatile unsigned int *) 0x42000004;
-
-
-
+unsigned int count = 500000;
+void delay(void)
+{
+    while(count>0)
+    {
+        count--;
+    }
+}
 
 int main() {
 
-    *gpio_oe_A = 0x00000000;
-    *gpio_oe_B = 0x00000000;
-    *gpio_oe_C = 0xFFFFFFFF;
+    *gpio_oe_A = 0xFFFFFFFF;
+
     
-    unsigned int A_data = 0;
-    unsigned int B_data = 0;
 
 
+    unsigned int data_A = 0xFFFF;
     while (1) { 
 
-        A_data = *gpio_data_A;
-        B_data = *gpio_data_B;
-        *gpio_data_C = A_data + B_data;
+        if((data_A & 0b111) == 0) {
+            data_A = 0xFFFF;  
+        } else {
+            data_A = data_A << 1;  
+        }
+        *gpio_data_A = data_A;
+
+        delay();
         
     }
 
