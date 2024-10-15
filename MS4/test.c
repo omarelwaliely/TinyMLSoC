@@ -1,34 +1,38 @@
-volatile unsigned int* gpio_data_A = (volatile unsigned int *) 0x40000000;
-volatile unsigned int* gpio_oe_A = (volatile unsigned int *) 0x40000004;
-unsigned int count = 500000;
-void delay(void)
-{
-    while(count>0)
-    {
-        count--;
-    }
+volatile unsigned int* gpio_data = (volatile unsigned int *) 0x40000000;
+volatile unsigned int* gpio_oe = (volatile unsigned int *) 0x40000004;
+
+volatile unsigned int* uart_ctrl = (volatile unsigned int *) 0x50000000;
+volatile unsigned int* uart_bauddiv = (volatile unsigned int *) 0x50000004;
+volatile unsigned int* uart_status = (volatile unsigned int *) 0x50000008;
+volatile unsigned int* uart_data = (volatile unsigned int *) 0x5000000C;
+
+
+void uart_init(int bauddiv){
+    *uart_bauddiv = bauddiv;
+    *uart_ctrl = 1;
 }
 
-int main() {
+void uart_putc(char c){
+    while(*uart_status == 0);
+    *uart_data = c;
+    *uart_ctrl |= 2;
+}
 
-    *gpio_oe_A = 0xFFFFFFFF;
+void uart_puts(char *s){
+    for(int i=0; s[i]; i++)
+        uart_putc(s[i]);
+}
 
-    
+void exit(){
+    *gpio_data = 0xF00FE00E;
+}
 
+int main(){
+    *gpio_oe = 0xFFFFFFFF;  // configure the GPIO as an output
 
-    unsigned int data_A = 0xFFFF;
-    while (1) { 
+    uart_init(10);
+    uart_puts("Hello World!\n");
 
-        if((data_A & 0b111) == 0) {
-            data_A = 0xFFFF;  
-        } else {
-            data_A = data_A << 1;  
-        }
-        *gpio_data_A = data_A;
-
-        delay();
-        
-    }
-
+    exit();
     return 0;
 }
