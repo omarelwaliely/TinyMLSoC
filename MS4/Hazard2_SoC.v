@@ -13,14 +13,12 @@
 
 module Hazard2_SoC (
     input wire          HCLK,
-    input wire          HRESETn,
-
-    output wire [31:0]  GPIO_OUT,
-    output wire [31:0]  GPIO_OE,
-    input wire [31:0]   GPIO_IN,
-
     output wire         UART_TX
 );
+
+    wire [31:0]  GPIO_OUT;
+    wire [31:0]  GPIO_OE;
+    wire          HRESETn;
 
     wire [31:0] HADDR;
     wire [1:0]  HTRANS;
@@ -34,6 +32,7 @@ module Hazard2_SoC (
     wire        S0_HSEL, S1_HSEL, S2_HSEL, S3_HSEL;
     wire        S0_HREADYOUT, S1_HREADYOUT, S2_HREADYOUT, S3_HREADYOUT;
 
+    assign HRESETn = 1'b1;
     Hazard2 CPU (
         .HCLK(HCLK),
         .HRESETn(HRESETn),
@@ -99,7 +98,7 @@ module Hazard2_SoC (
         .HRDATA(S0_HRDATA)
     );
 
-    ahbl_ram #(.SIZE(8*1024)) DMEM (
+    ahbl_ram #(.SIZE(8*740)) DMEM (
         .HCLK(HCLK),
         .HRESETn(HRESETn),
 

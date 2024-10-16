@@ -10,3 +10,5 @@ uart_tx.v
 lightcontrol.v
 serial_terminal.v
 ahbl_uart_tx.v
+upcounter.v
+ahbl_timer.v

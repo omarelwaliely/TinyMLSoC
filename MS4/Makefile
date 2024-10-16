@@ -47,13 +47,13 @@ runfpga: yosysfpga routing icepacking prog
 
 
 yosysfpga: 
-	yosys -p "synth_ice40 -top Hazard2_SoC -json Hazard2_SoC.json" Hazard2_SoC.v hazard2_cpu.v Hazard2.v ahbl_splitter.v ahbl_gpio_splitter.v ahbl_ram.v ahbl_rom.v ahbl_gpio.v lightcontrol.v
+	yosys -p "synth_ice40 -top top -json top.json" top.v Hazard2_SoC.v hazard2_cpu.v Hazard2.v ahbl_splitter.v ahbl_gpio_splitter.v ahbl_uart_tx.v uart_tx.v uart_rx.v ahbl_ram.v ahbl_rom.v ahbl_gpio.v lightcontrol.v 
 
 routing:
-	nextpnr-ice40 --up5k  --package sg48 --json Hazard2_SoC.json --asc Hazard2_SoC.asc --pcf  SoC.pcf --pcf-allow-unconstrained
+	nextpnr-ice40 --up5k  --package sg48 --json top.json --asc top.asc --pcf  SoC.pcf --pcf-allow-unconstrained
 
 icepacking:
-	icepack Hazard2_SoC.asc Hazard2_SoC.bin
+	icepack top.asc top.bin
 
 prog:
-	iceprog Hazard2_SoC.bin
+	iceprog top.bin

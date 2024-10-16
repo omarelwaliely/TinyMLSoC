@@ -23,16 +23,17 @@ void uart_puts(char *s){
         uart_putc(s[i]);
 }
 
-void exit(){
-    *gpio_data = 0xF00FE00E;
-}
+// void exit(){
+//     *gpio_data = 0xF00FE00E;
+// }
 
-int main(){
+int main(){     
+    
     *gpio_oe = 0xFFFFFFFF;  // configure the GPIO as an output
-
-    uart_init(10);
+    uart_init(625);
+    while(1)
+    {
     uart_puts("Hello World!\n");
-
-    exit();
+    }
     return 0;
 }
