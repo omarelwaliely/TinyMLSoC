@@ -13,12 +13,26 @@
 
 module Hazard2_SoC (
     input wire          HCLK,
-    output wire         UART_TX
+    output wire         UART_TX,
+    output wire [2:0]   LED_out
 );
+    wire [31:0]  GPIO_OUT_A;
+    wire [31:0]  GPIO_OE_A;
+    wire [31:0]   GPIO_IN_A;
 
     wire [31:0]  GPIO_OUT;
     wire [31:0]  GPIO_OE;
+    wire [31:0]  GPIO_IN;
     wire          HRESETn;
+    wire [31:0] TIMER_OUT;
+
+    //GPIO SLAVE WIRES
+    wire [31:0] A_HRDATA, B_HRDATA, C_HRDATA, timer_HRDATA;
+    wire        A_SEL, B_SEL, C_SEL, timer_SEL;
+    wire        A_HREADYOUT, B_HREADYOUT, C_HREADYOUT, timer_HREADYOUT;
+    
+
+//------------------------
 
     wire [31:0] HADDR;
     wire [1:0]  HTRANS;
@@ -28,11 +42,18 @@ module Hazard2_SoC (
     wire        HREADY;
     wire [31:0] HRDATA;
 
-    wire [31:0] S0_HRDATA, S1_HRDATA, S2_HRDATA, S3_HRDATA;
-    wire        S0_HSEL, S1_HSEL, S2_HSEL, S3_HSEL;
-    wire        S0_HREADYOUT, S1_HREADYOUT, S2_HREADYOUT, S3_HREADYOUT;
+    //SPLITTER SLAVE WIRES
+    wire [31:0] S0_HRDATA, S1_HRDATA, S2_HRDATA, S3_HRDATA, S4_HRDATA;
+    wire        S0_HSEL, S1_HSEL, S2_HSEL, S3_HSEL, S4_HSEL;
+    wire        S0_HREADYOUT, S1_HREADYOUT, S2_HREADYOUT, S3_HREADYOUT, S4_HREADYOUT;
+
+//------------------------ 
 
     assign HRESETn = 1'b1;
+    assign LED_out = GPIO_OUT_A[2:0];
+
+//------------------------ 
+
     Hazard2 CPU (
         .HCLK(HCLK),
         .HRESETn(HRESETn),
@@ -45,6 +66,26 @@ module Hazard2_SoC (
         .HREADY(HREADY),
         .HRDATA(HRDATA)
     );
+
+    ahbl_gpio GPIO_A (
+        .HCLK(HCLK),
+        .HRESETn(HRESETn),
+
+        .HADDR(HADDR),
+        .HTRANS(HTRANS),
+        .HSIZE(HSIZE),
+        .HWRITE(HWRITE),
+        .HREADY(HREADY),
+        .HSEL(A_SEL),
+        .HWDATA(HWDATA),
+        .HREADYOUT(A_HREADYOUT),
+        .HRDATA(A_HRDATA),
+
+        .GPIO_IN(GPIO_IN_A),
+        .GPIO_OUT(GPIO_OUT_A),
+        .GPIO_OE(GPIO_OE_A)
+    );
+
 
     ahbl_gpio GPIO (
         .HCLK(HCLK),
@@ -63,23 +104,6 @@ module Hazard2_SoC (
         .GPIO_IN(GPIO_IN),
         .GPIO_OUT(GPIO_OUT),
         .GPIO_OE(GPIO_OE)
-    );
-
-    ahbl_uart_tx TX (
-        .HCLK(HCLK),
-        .HRESETn(HRESETn),
-
-        .HADDR(HADDR),
-        .HTRANS(HTRANS),
-        .HSIZE(HSIZE),
-        .HWRITE(HWRITE),
-        .HREADY(HREADY),
-        .HSEL(S3_HSEL),
-        .HWDATA(HWDATA),
-        .HREADYOUT(S3_HREADYOUT),
-        .HRDATA(S3_HRDATA),
-
-        .tx(UART_TX)
     );
 
 
@@ -113,6 +137,39 @@ module Hazard2_SoC (
         .HRDATA(S1_HRDATA)
     );
 
+    ahbl_uart_tx TX (
+        .HCLK(HCLK),
+        .HRESETn(HRESETn),
+
+        .HADDR(HADDR),
+        .HTRANS(HTRANS),
+        .HSIZE(HSIZE),
+        .HWRITE(HWRITE),
+        .HREADY(HREADY),
+        .HSEL(S3_HSEL),
+        .HWDATA(HWDATA),
+        .HREADYOUT(S3_HREADYOUT),
+        .HRDATA(S3_HRDATA),
+
+        .tx(UART_TX)
+    );
+
+    ahbl_timer timer (
+        .HCLK(HCLK),
+        .HRESETn(HRESETn),
+
+        .HADDR(HADDR),
+        .HTRANS(HTRANS),
+        .HSIZE(HSIZE),
+        .HWRITE(HWRITE),
+        .HREADY(HREADY),
+        .HSEL(timer_SEL),
+        .HWDATA(HWDATA),
+        .HREADYOUT(timer_HREADYOUT),
+        .HRDATA(timer_HRDATA),
+
+        .TIMER_OUT(TIMER_OUT)
+    );
     // Slave 3 does not exist
     //assign S3_HREADYOUT = 1'b1;
     //assign S3_HRDATA = 32'hBADDBEEF;
@@ -147,5 +204,37 @@ module Hazard2_SoC (
         .S3_HRDATA(S3_HRDATA),
         .S3_HREADYOUT(S3_HREADYOUT)
 
+    );
+
+    ahbl_gpio_splitter #(.A(3'h0), 
+                        .B(3'h1),
+                        .C(3'h2),
+                        .timer(3'h3)
+    ) GPIO_SPLITTER (
+        .HCLK(HCLK),
+        .HRESETn(HRESETn),
+
+        .HADDR(HADDR),
+        .HTRANS(HTRANS),
+        .HREADY(HREADY),
+        .HRDATA(S2_HRDATA),
+        .HSEL(S2_HSEL),
+        .HREADYOUT(S2_HREADYOUT),
+
+        .A_SEL(A_SEL),
+        .A_HRDATA(A_HRDATA),
+        .A_HREADYOUT(A_HREADYOUT),
+
+        .B_SEL(B_SEL),
+        .B_HRDATA(0),
+        .B_HREADYOUT(1'b1),
+
+        .C_SEL(C_SEL),
+        .C_HRDATA(0),
+        .C_HREADYOUT(1'b1),
+
+        .timer_SEL(timer_SEL),
+        .timer_HRDATA(timer_HRDATA),
+        .timer_HREADYOUT(timer_HREADYOUT)
     );
 endmodule
