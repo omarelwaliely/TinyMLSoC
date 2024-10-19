@@ -24,7 +24,7 @@ test.hex: test.elf
 
 # Compile the C code into a RISC-V ELF executable
 test.elf: link.ld crt.s test.c
-	$(CROSS)gcc $(CFLAGS)  $(LFLAGS) -o test.elf crt.s test.c
+	$(CROSS)gcc $(CFLAGS) $(LFLAGS) -o test.elf crt.s test.c
 
 # A pseudo target to ensure hex files are generated before simulation
 hex: test.hex
@@ -47,7 +47,7 @@ runfpga: yosysfpga routing icepacking prog
 
 
 yosysfpga: 
-	yosys -p "synth_ice40 -top top -json top.json" top.v Hazard2_SoC.v hazard2_cpu.v Hazard2.v ahbl_splitter.v ahbl_gpio_splitter.v ahbl_ram.v ahbl_rom.v ahbl_gpio.v uart_tx.v upcounter.v ahbl_timer.v
+	yosys -p "synth_ice40 -top top -json top.json" top.v Hazard2_SoC.v hazard2_cpu.v Hazard2.v ahbl_splitter.v ahbl_timer.v upcounter.v ahbl_gpio_splitter.v ahbl_uart_tx.v uart_tx.v uart_rx.v ahbl_ram.v ahbl_rom.v ahbl_gpio.v lightcontrol.v 
 
 routing:
 	nextpnr-ice40 --up5k  --package sg48 --json top.json --asc top.asc --pcf  SoC.pcf --pcf-allow-unconstrained
@@ -56,4 +56,4 @@ icepacking:
 	icepack top.asc top.bin
 
 prog:
-	sudo /home/oss-cad-suite/bin/iceprog top.bin
+	iceprog top.bin

@@ -1,9 +1,9 @@
 module top (
+    output wire TX,
     output wire [2:0] LED_RGB
 );
     wire clk;
     wire [2:0] LED_data;
-
 
     SB_HFOSC #(
     .CLKHF_DIV("0b11")  
@@ -16,10 +16,9 @@ module top (
 
     Hazard2_SoC SoC(
     .HCLK(clk),
-    .HRESETn(1'b1),
+    .UART_TX(TX),
     .LED_out(LED_data)
     );
-
 
 	SB_RGBA_DRV #(
 		.CURRENT_MODE("0b1"),
@@ -36,4 +35,5 @@ module top (
 		.RGB1(LED_RGB[1]),
 		.RGB2(LED_RGB[2])
 	);
+
 endmodule

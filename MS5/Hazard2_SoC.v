@@ -7,34 +7,33 @@
     The Memory Map:
         - 0x0000_0000 - 0x0000_1FFF : Program Memory
         - 0x2000_2000 - 0x2000_1FFF : Data Memory
-        - 0x4000_0000 : GPIO Port A
-        - 0x5000_0000 : GPIO Port B
-        - 0x5000_0000 : GPIO Port C
+        - 0x4000_0000 - GPIO Port
+        - 0x5000_0000 - UART Transmitter
 */
 
 module Hazard2_SoC (
     input wire          HCLK,
-    input wire          HRESETn,
+    output wire         UART_TX,
     output wire [2:0]   LED_out
-    
-    // output wire [31:0]  GPIO_OUT_A,
-    // output wire [31:0]  GPIO_OE_A,
-    // input wire [31:0]   GPIO_IN_A,
-
-    // output wire [31:0]  GPIO_OUT_B,
-    // output wire [31:0]  GPIO_OE_B,
-    // input wire [31:0]   GPIO_IN_B,
-
-    // output wire [31:0]  GPIO_OUT_C,
-    // output wire [31:0]  GPIO_OE_C,
-    // input wire [31:0]   GPIO_IN_C
-
-
 );
-    //  wire          HRESETn;
     wire [31:0]  GPIO_OUT_A;
     wire [31:0]  GPIO_OE_A;
     wire [31:0]   GPIO_IN_A;
+
+    wire [31:0]  GPIO_OUT;
+    wire [31:0]  GPIO_OE;
+    wire [31:0]  GPIO_IN;
+    wire          HRESETn;
+    wire [31:0] TIMER_OUT;
+
+    //GPIO SLAVE WIRES
+    wire [31:0] A_HRDATA, B_HRDATA, C_HRDATA, timer_HRDATA;
+    wire        A_SEL, B_SEL, C_SEL, timer_SEL;
+    wire        A_HREADYOUT, B_HREADYOUT, C_HREADYOUT, timer_HREADYOUT;
+    
+
+//------------------------
+
     wire [31:0] HADDR;
     wire [1:0]  HTRANS;
     wire [2:0] 	HSIZE;
@@ -43,28 +42,17 @@ module Hazard2_SoC (
     wire        HREADY;
     wire [31:0] HRDATA;
 
-    wire [7:0]    UARTDATA;
-    wire          UART_DONE, Tx;
-    reg           UART_START;
-    wire [31:0] TIMER_OUT;
-
-
     //SPLITTER SLAVE WIRES
-
     wire [31:0] S0_HRDATA, S1_HRDATA, S2_HRDATA, S3_HRDATA, S4_HRDATA;
     wire        S0_HSEL, S1_HSEL, S2_HSEL, S3_HSEL, S4_HSEL;
     wire        S0_HREADYOUT, S1_HREADYOUT, S2_HREADYOUT, S3_HREADYOUT, S4_HREADYOUT;
 
-    //GPIO SLAVE WIRES
+//------------------------ 
 
-    wire [31:0] A_HRDATA, B_HRDATA, C_HRDATA, timer_HRDATA;
-    wire        A_SEL, B_SEL, C_SEL, timer_SEL;
-    wire        A_HREADYOUT, B_HREADYOUT, C_HREADYOUT, timer_HREADYOUT;
-    // assign HRESETn = 1'b1;
-    assign UARTDATA = {5'b00000, GPIO_OUT_A[2:0]}; 
+    assign HRESETn = 1'b1;
     assign LED_out = GPIO_OUT_A[2:0];
-    
-    //ISTANTIATIONS
+
+//------------------------ 
 
     Hazard2 CPU (
         .HCLK(HCLK),
@@ -78,50 +66,6 @@ module Hazard2_SoC (
         .HREADY(HREADY),
         .HRDATA(HRDATA)
     );
-
-    //memory
-
-
-    
-    uart_tx TRANSMITTER (
-            .clk(HCLK),
-            .rst_n(HRESETn),
-            .en(1'b1),               // Always enabled
-            .start(UART_START),      // Start signal to transmit
-            .data(UARTDATA),        // Data to send (RGB value)
-            .baud_div(16'd9),    // Baud rate divider (for 9600 baud @ 100 MHz)
-            .tx(Tx),                 // UART TX output
-            .done(UART_DONE)         // Done flag
-        );
-
-    ahbl_rom #(.SIZE(8*740)) PMEM (
-        .HCLK(HCLK),
-        .HRESETn(HRESETn),
-
-        .HADDR(HADDR),
-        .HREADY(HREADY),
-        .HSEL(S0_HSEL),
-        .HREADYOUT(S0_HREADYOUT),
-        .HRDATA(S0_HRDATA)
-    );
-
-    ahbl_ram #(.SIZE(8*740)) DMEM (
-        .HCLK(HCLK),
-        .HRESETn(HRESETn),
-
-        .HADDR(HADDR),
-        .HTRANS(HTRANS),
-        .HSIZE(HSIZE),
-        .HWRITE(HWRITE),
-        .HREADY(HREADY),
-        .HSEL(S1_HSEL),
-        .HWDATA(HWDATA),
-        .HREADYOUT(S1_HREADYOUT),
-        .HRDATA(S1_HRDATA)
-    );
-
-
-    //GPIOS
 
     ahbl_gpio GPIO_A (
         .HCLK(HCLK),
@@ -141,14 +85,75 @@ module Hazard2_SoC (
         .GPIO_OUT(GPIO_OUT_A),
         .GPIO_OE(GPIO_OE_A)
     );
-    
-    // light_control LC    (
-	// .clk(HCLK),
-	// .RGB_in(GPIO_OUT_A[2:0]),
-	// .LED_RGB(LED_out)
-    // );
 
-    //timer (will change name to ahbl_peripheral instead of)
+
+    ahbl_gpio GPIO (
+        .HCLK(HCLK),
+        .HRESETn(HRESETn),
+
+        .HADDR(HADDR),
+        .HTRANS(HTRANS),
+        .HSIZE(HSIZE),
+        .HWRITE(HWRITE),
+        .HREADY(HREADY),
+        .HSEL(S2_HSEL),
+        .HWDATA(HWDATA),
+        .HREADYOUT(S2_HREADYOUT),
+        .HRDATA(S2_HRDATA),
+
+        .GPIO_IN(GPIO_IN),
+        .GPIO_OUT(GPIO_OUT),
+        .GPIO_OE(GPIO_OE)
+    );
+
+
+    ahbl_ram #(.SIZE(8*1024)) PMEM (
+        .HCLK(HCLK),
+        .HRESETn(HRESETn),
+
+        .HADDR(HADDR),
+        .HTRANS(HTRANS),
+        .HSIZE(HSIZE),
+        .HWRITE(HWRITE),
+        .HREADY(HREADY),
+        .HSEL(S0_HSEL),
+        .HWDATA(HWDATA),
+        .HREADYOUT(S0_HREADYOUT),
+        .HRDATA(S0_HRDATA)
+    );
+
+    ahbl_ram #(.SIZE(8*740)) DMEM (
+        .HCLK(HCLK),
+        .HRESETn(HRESETn),
+
+        .HADDR(HADDR),
+        .HTRANS(HTRANS),
+        .HSIZE(HSIZE),
+        .HWRITE(HWRITE),
+        .HREADY(HREADY),
+        .HSEL(S1_HSEL),
+        .HWDATA(HWDATA),
+        .HREADYOUT(S1_HREADYOUT),
+        .HRDATA(S1_HRDATA)
+    );
+
+    ahbl_uart_tx TX (
+        .HCLK(HCLK),
+        .HRESETn(HRESETn),
+
+        .HADDR(HADDR),
+        .HTRANS(HTRANS),
+        .HSIZE(HSIZE),
+        .HWRITE(HWRITE),
+        .HREADY(HREADY),
+        .HSEL(S3_HSEL),
+        .HWDATA(HWDATA),
+        .HREADYOUT(S3_HREADYOUT),
+        .HRDATA(S3_HRDATA),
+
+        .tx(UART_TX)
+    );
+
     ahbl_timer timer (
         .HCLK(HCLK),
         .HRESETn(HRESETn),
@@ -165,17 +170,15 @@ module Hazard2_SoC (
 
         .TIMER_OUT(TIMER_OUT)
     );
+    // Slave 3 does not exist
+    //assign S3_HREADYOUT = 1'b1;
+    //assign S3_HRDATA = 32'hBADDBEEF;
 
-
-
-
-   
-    //SPLITTERS
 
     ahbl_splitter # ( .S0(4'h0),     // Program Memory
                         .S1(4'h2),     // Data Memory
-                        .S2(4'h4),     // GPIO splitter
-                        .S3(4'h8) // nothing
+                        .S2(4'h4),     // GPIO Port
+                        .S3(4'h5)      // UART Transmitter
     ) SPLITTER (
         .HCLK(HCLK),
         .HRESETn(HRESETn),
@@ -202,6 +205,7 @@ module Hazard2_SoC (
         .S3_HREADYOUT(S3_HREADYOUT)
 
     );
+
     ahbl_gpio_splitter #(.A(3'h0), 
                         .B(3'h1),
                         .C(3'h2),
@@ -232,10 +236,5 @@ module Hazard2_SoC (
         .timer_SEL(timer_SEL),
         .timer_HRDATA(timer_HRDATA),
         .timer_HREADYOUT(timer_HREADYOUT)
-
-
-        
-
-);
-
+    );
 endmodule
