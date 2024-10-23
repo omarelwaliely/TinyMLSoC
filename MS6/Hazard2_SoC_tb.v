@@ -68,8 +68,11 @@ module i2s_rx_tb;
         integer i;
         begin
             for (i = 0; i < 64; i = i + 1) begin
-                @(posedge i2s_clk); 
-                rx = data[i]; 
+                @(posedge i2s_clk);
+                if(ws==1 && i>0 && i<32) 
+                rx = data[i];
+                else if(ws==0 && i>32 && i<64) 
+                rx = data[i];  
             end
         end
     endtask
