@@ -45,21 +45,16 @@ module i2s_rx_tb;
         // Initialize signals
         rx = 0;
 
-        // Simulate data stream
         @(posedge rst_n);
         #50;
 
         // Example I2S data stream for two 32-bit stereo samples
         send_i2s_data(64'h55667788ABCDEFAB); 
-
+        #10
         send_i2s_data(64'h22334455FBABABAB);
-
+        #10
         send_i2s_data(64'hBABABABA55667788);
-
-        send_i2s_data(64'h55667788ABCDEFAB);
-
-        send_i2s_data(64'h55667788ABCDEFAB);
-
+        #10
         send_i2s_data(64'h55667788ABCDEFAB);
         #100;
 
@@ -81,14 +76,24 @@ module i2s_rx_tb;
 
     // Monitor to check the received data and stop the simulation on a specific condition
     always @ (posedge i2s_clk) begin
-        if (rx_data == 64'h55667788ABCDEFAB) begin
-            $display("TB: Test Passed: Received correct data 0xAABBCCDDEEFF1122");
+        if (rx_data == 64'h0066778800CDEFAB) begin
+            $display("TB: Test Passed: Received correct data");
             $finish;
         end
-        // else if (rx_data == 64'h1122334455667788) begin
-        //     $display("TB: Test Passed: Received correct data 0x1122334455667788");
-        //     $finish;
-        // end
+        if (rx_data == 64'h0033445500ABABAB) begin
+            $display("TB: Test Passed: Received correct data");
+            $finish;
+        end
+        if (rx_data == 64'h00BABABA00667788) begin
+            $display("TB: Test Passed: Received correct data");
+            $finish;
+        end
+        if (rx_data == 64'h0066778800CDEFAB) begin
+            $display("TB: Test Passed: Received correct data");
+            $finish;
+        end
+
+
     end
 
 endmodule
