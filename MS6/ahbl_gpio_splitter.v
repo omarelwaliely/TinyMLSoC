@@ -1,7 +1,8 @@
 module ahbl_gpio_splitter #(parameter  A=3'h0, 
                                     B=3'h1,
                                     C = 3'h2,
-                                    timer = 3'h3
+                                    timer = 3'h3,
+                                    i2s = 3'h4
                                     )
 (
     input   wire        HCLK,
@@ -34,30 +35,36 @@ module ahbl_gpio_splitter #(parameter  A=3'h0,
     // timer
     output  wire        timer_SEL,
     input   wire [31:0] timer_HRDATA,
-    input   wire        timer_HREADYOUT
+    input   wire        timer_HREADYOUT,
+
+    // i2s
+    output  wire        i2s_SEL,
+    input   wire [31:0] i2s_HRDATA,
+    input   wire        i2s_HREADYOUT
 
 );
 
     // The Decoder
-    reg [3:0] sel;
-    reg [3:0] sel_d;
+    reg [4:0] sel;
+    reg [4:0] sel_d;
     always @*
         case(HADDR[27:24])
-            A: sel = 4'b0001;
-            B: sel = 4'b0010;
-            C: sel = 4'b0100;
-            timer: sel = 4'b1000;
-            default: sel = 4'b0000;
+            A: sel = 5'b00001;
+            B: sel = 5'b00010;
+            C: sel = 5'b00100;
+            timer: sel = 5'b01000;
+            i2s: sel = 5'b10000;
+            default: sel = 5'b00000;
         endcase
     assign A_SEL = sel[0];
     assign B_SEL = sel[1];
     assign C_SEL = sel[2];
     assign timer_SEL = sel[3];
-
+    assign i2s_SEL = sel[4];
     // The Slave MUX Selection Saving
     always@(posedge HCLK or negedge HRESETn) begin
         if(~HRESETn) begin
-            sel_d <= 4'b0000;
+            sel_d <= 5'b00000;
         end else if(HTRANS[1] & HREADY) begin
             sel_d <= sel;
         end
@@ -67,12 +74,14 @@ module ahbl_gpio_splitter #(parameter  A=3'h0,
                         (sel_d[1])  ?   B_HREADYOUT :
                         (sel_d[2])  ?   C_HREADYOUT :
                         (sel_d[3])  ?   timer_HREADYOUT :
+                        (sel_d[4])  ?   i2s_HREADYOUT :
                         1'b1;
 
     assign HRDATA =   (sel_d[0])  ?   A_HRDATA :
                         (sel_d[1])  ?   B_HRDATA :
                         (sel_d[2])  ?   C_HRDATA :
                         (sel_d[3])  ?   timer_HRDATA :
+                        (sel_d[4])  ?   i2s_HRDATA :
                         32'hBADDBEEF;
 
 endmodule

@@ -11,5 +11,6 @@ lightcontrol.v
 serial_terminal.v
 ahbl_uart_tx.v
 upcounter.v
+i2s_rx.v
 ahbl_i2s_rx.v
 ahbl_timer.v

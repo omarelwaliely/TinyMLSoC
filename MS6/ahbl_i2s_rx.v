@@ -1,85 +1,75 @@
-module i2s_rx (
-    input wire clk,             // System clock
-    input wire rst_n,           // Active-low reset
-    input wire rx,              // I2S receive input
-    output reg  ws,
-    output reg i2s_clk,
-    output reg [63:0] rx_data  // Received data
+module ahbl_i2s_rx (
+    // AHB-Lite Interface
+    input  wire        HCLK,
+    input  wire        HRESETn,
+    input  wire [31:0] HADDR,
+    input  wire [1:0]  HTRANS,
+    input  wire        HWRITE,
+    input  wire [2:0]  HSIZE,
+    input  wire [31:0] HWDATA,
+    input  wire        HSEL,
+    input  wire        HREADY,
+
+    output wire [31:0] HRDATA,
+    output wire        HREADYOUT,
+
+    input  wire        rx,      
+    output wire        ws,      
+    output wire        i2s_clk, 
+    output wire [63:0] rx_data   
 );
 
-    //I2S Receiver States
-    parameter STATE_IDLE  = 2'b00;
-    parameter RIGHT_STEREO = 2'b01;
-    parameter LEFT_STEREO  = 2'b10;
+    localparam MODE_ADDR = 'h00;
 
+    reg [31:0] HADDR_d;
+    reg [1:0]  HTRANS_d;
+    reg        HWRITE_d;
+    reg        HSEL_d;
+    reg [1:0]  MODE_reg;  
 
-    reg [1:0] state;
-    reg [5:0] bit_idx;
-    reg [63:0] rx_shift_reg;
-    reg clk_count; 
+    wire MODE_sel = (HADDR_d[23:0] == MODE_ADDR);
 
-// Clock divider (4MHz)
-always @(posedge clk or negedge rst_n) begin
-    if (!rst_n) begin
-        clk_count <= 0;
-        i2s_clk <= 0;
-    end else begin
-        if (clk_count == 1) begin
-            i2s_clk <= ~i2s_clk; 
-            clk_count <= 0;
-        end else begin
-            clk_count <= clk_count + 1;
+    always @(posedge HCLK) begin
+        if (!HRESETn) begin
+            HADDR_d   <= 32'h0;
+            HSEL_d    <= 1'b0;
+            HWRITE_d  <= 1'b0;
+            HTRANS_d  <= 2'b0;
+        end else if (HREADY) begin
+            HADDR_d   <= HADDR;
+            HSEL_d    <= HSEL;
+            HWRITE_d  <= HWRITE;
+            HTRANS_d  <= HTRANS;
         end
     end
-end
 
-
-    always @(posedge i2s_clk or negedge rst_n) begin
-        if (!rst_n) begin
-            state         <= STATE_IDLE;
-            bit_idx       <= 6'b0;
-            rx_shift_reg  <= 64'b0;
-            rx_data       <= 32'b0;
-            ws <= 1;
-
-
-        end else begin
-            case (state)
-                RIGHT_STEREO: begin
-                    ws = 1;
-                    if (bit_idx >= 31) begin
-                    bit_idx <= bit_idx + 1;
-                    rx_data[31:0]       <= rx_shift_reg[31:0];
-                    state <= LEFT_STEREO;
-                    rx_shift_reg[31:0]  <= 32'd0;
-                    end else begin
-                            rx_shift_reg[bit_idx] <= rx;
-                            bit_idx <= bit_idx + 1;
-                            if(bit_idx>=24)
-                            rx_shift_reg[bit_idx] <= 1'b0;
-                    end
-                
-                end
-                LEFT_STEREO: begin
-                    ws <= 1'b0;
-                    if (bit_idx >= 63) begin
-                    rx_data[63:32]       <= rx_shift_reg[63:32];
-                    state <= RIGHT_STEREO;
-                    rx_shift_reg[63:32]  <= 32'd0;
-                    bit_idx <= 6'b0;
-                    end else begin
-                            rx_shift_reg[bit_idx] <= rx;
-                            bit_idx <= bit_idx + 1;
-                            if(bit_idx>=56)
-                            rx_shift_reg[bit_idx] <= 1'b0;
-                    end
-                end 
-                STATE_IDLE: begin
-                     state    <= RIGHT_STEREO;
-                end
-                default: state <= STATE_IDLE;
-            endcase
+    // 00 --> left stereo
+    // 01 --> right stereo
+    // 10 --> full stereo 
+    always @(posedge HCLK) begin
+        if (!HRESETn) begin
+            MODE_reg <= 2'b00;  //default will be the left stereo
+        end else if (HREADY && HSEL && HWRITE && MODE_sel) begin
+            MODE_reg <= HWDATA[1:0]; 
         end
     end
+
+    assign HRDATA = (MODE_reg == 2'b00) ? rx_data[31:0] :   // left stereo (bits 0 to 31)
+                    (MODE_reg == 2'b01) ? rx_data[63:32] :  // right stereo (bits 32 to 63)
+                    (MODE_reg == 2'b10) ? rx_data[63:0] :   // full stereo (bits 0 to 63)
+                    32'hDEADBEEF;                           
+
+    // Ready Output (Always Ready in this case)
+    assign HREADYOUT = 1'b1;
+
+    // I2S Receiver Instance
+    i2s_rx i2s_receiver (
+        .clk(HCLK),
+        .rst_n(HRESETn),
+        .rx(rx),
+        .ws(ws),
+        .i2s_clk(i2s_clk),
+        .rx_data(rx_data)
+    );
 
 endmodule
