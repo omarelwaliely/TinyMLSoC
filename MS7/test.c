@@ -1,3 +1,33 @@
+// #include <stdint.h>
+
+// volatile unsigned int* gpio_data_A = (volatile unsigned int *) 0x40000000;
+// volatile unsigned int* gpio_oe_A = (volatile unsigned int *) 0x40000004;
+
+// void delay(void) {
+//     volatile unsigned int count = 500000;
+//     while (count > 0) {
+//         count--;
+//     }
+// }
+
+// int main() {
+//     *gpio_oe_A = 0x00000003;  // Enable only the 2 most significant bits for output
+
+//     unsigned int data_A = 0x3;  // Initialize with the 2 MSBs set
+
+//     while (1) {
+//         if ((data_A & 0b11) == 0) {
+//             data_A = 0x3;  // Reset to set the 2 MSBs
+//         } else {
+//             data_A <<= 1;  // Shift left by 1
+//         }
+
+//         *gpio_data_A = data_A;
+//         delay();
+//     }
+
+//     return 0;
+// }
 volatile unsigned int* gpio_data_A = (volatile unsigned int *) 0x40000000;
 volatile unsigned int* gpio_oe_A = (volatile unsigned int *) 0x40000004;
 volatile unsigned int* mode = (volatile unsigned int *) 0x44000000;

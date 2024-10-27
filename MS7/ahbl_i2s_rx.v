@@ -20,6 +20,8 @@ module ahbl_i2s_rx (
 );
 
     localparam MODE_ADDR = 'h00;
+    localparam MODE_ADDR = 'h04;
+    
 
     reg [31:0] HADDR_d;
     reg [1:0]  HTRANS_d;

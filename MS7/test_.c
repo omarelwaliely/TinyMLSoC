@@ -13,9 +13,6 @@ int main() {
 
     *gpio_oe_A = 0xFFFFFFFF;
 
-    
-
-
     unsigned int data_A = 0xFFFF;
     while (1) { 
 

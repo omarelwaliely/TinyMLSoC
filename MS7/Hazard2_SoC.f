@@ -14,3 +14,4 @@ upcounter.v
 i2s_rx.v
 ahbl_i2s_rx.v
 ahbl_timer.v
+top.v

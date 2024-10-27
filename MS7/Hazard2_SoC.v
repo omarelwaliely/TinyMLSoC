@@ -15,7 +15,7 @@ module Hazard2_SoC (
     input wire          HCLK,
     input wire          HRESETn,
     // output wire         UART_TX,
-    // output wire [2:0]   LED_out,
+    output wire [2:0]   LED_out,
     output wire [63:0]  I2S_out,
     output wire         ws,
     output wire         i2s_clk
@@ -58,7 +58,7 @@ module Hazard2_SoC (
 
     // assign HRESETn = 1'b1;
     assign LED_out = GPIO_OUT_A[2:0];
-    assign ws = GPIO_OUT_A[3];
+    // assign ws = GPIO_OUT_A[3];
 
 //------------------------ 
 
@@ -176,7 +176,7 @@ module Hazard2_SoC (
         .HREADYOUT(i2s_HREADYOUT),
         .HRDATA(i2s_HRDATA),
         .rx(GPIO_OUT_A[0]),
-        .ws(GPIO_OUT_A[3]),      
+        .ws(ws),      
         .i2s_clk(i2s_clk), 
         .rx_data(I2S_out)
         
