@@ -20,7 +20,8 @@ module ahbl_i2s_rx (
 );
 
     localparam MODE_ADDR = 'h00;
-    localparam MODE_ADDR = 'h04;
+    //localparam DATA_ADDR = 'h04;
+
     
 
     reg [31:0] HADDR_d;
@@ -28,8 +29,11 @@ module ahbl_i2s_rx (
     reg        HWRITE_d;
     reg        HSEL_d;
     reg [1:0]  MODE_reg;  
+    reg [31:0]  DATA_reg;  
+
 
     wire MODE_sel = (HADDR_d[23:0] == MODE_ADDR);
+    //wire DATA_sel = (HADDR_d[23:0] == DATA_ADDR);
 
     always @(posedge HCLK) begin
         if (!HRESETn) begin
@@ -48,17 +52,17 @@ module ahbl_i2s_rx (
     // 00 --> left stereo
     // 01 --> right stereo
     // 10 --> full stereo 
-    always @(posedge HCLK) begin
-        if (!HRESETn) begin
-            MODE_reg <= 2'b00;  //default will be the left stereo
-        end else if (HREADY && HSEL && HWRITE && MODE_sel) begin
-            MODE_reg <= HWDATA[1:0]; 
-        end
-    end
+    // always @(posedge HCLK) begin
+    //     if (!HRESETn) begin
+    //         MODE_reg <= 2'b00;  //default will be the left stereo
+    //     end else if (HREADY && HSEL && HWRITE && MODE_sel) begin
+    //         MODE_reg <= HWDATA[1:0]; 
+    //     end
+    // end
 
-    assign HRDATA = (MODE_reg == 2'b00) ? rx_data[31:0] :   // left stereo (bits 0 to 31)
-                    (MODE_reg == 2'b01) ? rx_data[63:32] :  // right stereo (bits 32 to 63)
-                    (MODE_reg == 2'b10) ? rx_data[63:0] :   // full stereo (bits 0 to 63)
+    assign HRDATA = (MODE_sel) ? rx_data[31:0] :   // left stereo (bits 0 to 31)
+                    // (MODE_reg == 2'b01) ? rx_data[63:32] :  // right stereo (bits 32 to 63)
+                    // (MODE_reg == 2'b10) ? rx_data[63:0] :   // full stereo (bits 0 to 63)
                     32'hDEADBEEF;                           
 
     // Ready Output (Always Ready in this case)

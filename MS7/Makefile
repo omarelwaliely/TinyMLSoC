@@ -23,7 +23,8 @@ test.hex: test.elf
 	$(CROSS)objcopy --verilog-data-width=4 -O verilog test.elf test.hex
 
 # Compile the C code into a RISC-V ELF executable
-test.elf: link.ld crt.s test.c
+test.elf: link.ld crt.s test.criscv64-unknown-elf-objcopy -O ihex input.elf output.hex
+
 	$(CROSS)gcc $(CFLAGS) $(LFLAGS) -o test.elf crt.s test.c
 
 # A pseudo target to ensure hex files are generated before simulation

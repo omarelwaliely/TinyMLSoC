@@ -14,13 +14,13 @@
 module Hazard2_SoC (
     input wire          HCLK,
     input wire          HRESETn,
-    // output wire         UART_TX,
-    output wire [2:0]   LED_out,
+    output wire         UART_TX,
+    //output wire [2:0]   LED_out,
     output wire [63:0]  I2S_out,
     output wire         ws,
     output wire         i2s_clk
 );
-    wire UART_TX;
+    //wire UART_TX;
     wire [2:0] LED_out;
     wire [31:0]  GPIO_OUT_A;
     wire [31:0]  GPIO_OE_A;

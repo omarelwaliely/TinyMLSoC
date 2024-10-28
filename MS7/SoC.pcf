@@ -3,7 +3,7 @@ set_io -nowarn HCLK        35
 set_frequency HCLK         6
 
 # RS232
-set_io -nowarn RX          6
+set_io -nowarn RX          42
 set_io -nowarn TX          9
 
 # LEDs and Button
@@ -42,7 +42,6 @@ set_io -nowarn P1B1       43
 set_io -nowarn P1B2       38
 set_io -nowarn P1B3       34
 set_io -nowarn P1B4       31
-set_io -nowarn P1B7       42
 set_io -nowarn P1B8       36
 set_io -nowarn P1B9       32
 set_io -nowarn P1B10      28
@@ -76,7 +75,6 @@ set_io -nowarn I2S_out[62] 4   # Map second most significant bit to pin 7
 set_io -nowarn I2S_out[16] 19
 
 # ws signal mapping
-set_io -nowarn ws 6  # Map ws signal to pin 8
-
+set_io -nowarn ws 6  
 # i2s_clk signal mapping
-set_io -nowarn i2s_clk 9  # Map i2s_clk signal to pin 9
+set_io -nowarn i2s_clk 9 
