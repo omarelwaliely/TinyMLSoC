@@ -14,6 +14,7 @@
 module Hazard2_SoC (
     input wire          HCLK,
     input wire          HRESETn,
+    input wire          I2S_input,
     output wire         UART_TX,
     //output wire [2:0]   LED_out,
     output wire [63:0]  I2S_out,
@@ -175,7 +176,7 @@ module Hazard2_SoC (
         .HWDATA(HWDATA),
         .HREADYOUT(i2s_HREADYOUT),
         .HRDATA(i2s_HRDATA),
-        .rx(GPIO_OUT_A[0]),
+        .rx(I2S_input),
         .ws(ws),      
         .i2s_clk(i2s_clk), 
         .rx_data(I2S_out)

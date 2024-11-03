@@ -3,7 +3,7 @@ set_io -nowarn HCLK        35
 set_frequency HCLK         6
 
 # RS232
-set_io -nowarn RX          42
+set_io -nowarn UART_TX          42
 set_io -nowarn TX          9
 
 # LEDs and Button
@@ -38,7 +38,7 @@ set_io -nowarn P1A9       46
 set_io -nowarn P1A10      44
 
 # PMOD 1B
-set_io -nowarn P1B1       43
+set_io -nowarn I2S_input       43
 set_io -nowarn P1B2       38
 set_io -nowarn P1B3       34
 set_io -nowarn P1B4       31

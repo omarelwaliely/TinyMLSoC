@@ -60,7 +60,7 @@ module ahbl_i2s_rx (
     //     end
     // end
 
-    assign HRDATA = (MODE_sel) ? rx_data[31:0] :   // left stereo (bits 0 to 31)
+    assign HRDATA = (MODE_sel) ? rx_data[45:14] :   // left stereo (bits 0 to 31)
                     // (MODE_reg == 2'b01) ? rx_data[63:32] :  // right stereo (bits 32 to 63)
                     // (MODE_reg == 2'b10) ? rx_data[63:0] :   // full stereo (bits 0 to 63)
                     32'hDEADBEEF;                           
