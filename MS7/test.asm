@@ -38,7 +38,7 @@ Disassembly of section .text:
   78:	00000f13          	li	t5,0
   7c:	00000f93          	li	t6,0
   80:	00000517          	auipc	a0,0x0
-  84:	22050513          	add	a0,a0,544 # 2a0 <_sidata>
+  84:	25850513          	add	a0,a0,600 # 2d8 <_sidata>
   88:	20000597          	auipc	a1,0x20000
   8c:	f7858593          	add	a1,a1,-136 # 20000000 <uart_data>
   90:	20000617          	auipc	a2,0x20000
@@ -72,7 +72,7 @@ Disassembly of section .text:
 
 000000d8 <delay>:
   d8:	000017b7          	lui	a5,0x1
-  dc:	77078793          	add	a5,a5,1904 # 1770 <_sidata+0x14d0>
+  dc:	77078793          	add	a5,a5,1904 # 1770 <_sidata+0x1498>
   e0:	02f50533          	mul	a0,a0,a5
   e4:	200007b7          	lui	a5,0x20000
   e8:	0107a783          	lw	a5,16(a5) # 20000010 <LOAD_VALUE>
@@ -149,7 +149,7 @@ Disassembly of section .text:
  1e4:	ff0710e3          	bne	a4,a6,1c4 <uart_puts_hex+0x14>
  1e8:	000017b7          	lui	a5,0x1
  1ec:	00414683          	lbu	a3,4(sp)
- 1f0:	a0d78793          	add	a5,a5,-1523 # a0d <_sidata+0x76d>
+ 1f0:	a0d78793          	add	a5,a5,-1523 # a0d <_sidata+0x735>
  1f4:	00f11623          	sh	a5,12(sp)
  1f8:	00010723          	sb	zero,14(sp)
  1fc:	04068263          	beqz	a3,240 <uart_puts_hex+0x90>
@@ -179,22 +179,36 @@ Disassembly of section .text:
  254:	200007b7          	lui	a5,0x20000
  258:	0087a703          	lw	a4,8(a5) # 20000008 <uart_bauddiv>
  25c:	00812c23          	sw	s0,24(sp)
- 260:	00112e23          	sw	ra,28(sp)
- 264:	200007b7          	lui	a5,0x20000
- 268:	fff00613          	li	a2,-1
- 26c:	00c7a783          	lw	a5,12(a5) # 2000000c <uart_ctrl>
- 270:	00c6a023          	sw	a2,0(a3)
- 274:	200006b7          	lui	a3,0x20000
- 278:	0186a403          	lw	s0,24(a3) # 20000018 <i2s_data>
- 27c:	27100693          	li	a3,625
- 280:	00d72023          	sw	a3,0(a4)
- 284:	00100713          	li	a4,1
- 288:	00e7a023          	sw	a4,0(a5)
- 28c:	00042783          	lw	a5,0(s0)
- 290:	00f12623          	sw	a5,12(sp)
- 294:	00c12503          	lw	a0,12(sp)
- 298:	f19ff0ef          	jal	1b0 <uart_puts_hex>
- 29c:	ff1ff06f          	j	28c <main+0x44>
+ 260:	00912a23          	sw	s1,20(sp)
+ 264:	01212823          	sw	s2,16(sp)
+ 268:	01312623          	sw	s3,12(sp)
+ 26c:	01412423          	sw	s4,8(sp)
+ 270:	00112e23          	sw	ra,28(sp)
+ 274:	200007b7          	lui	a5,0x20000
+ 278:	fff00613          	li	a2,-1
+ 27c:	00c7a783          	lw	a5,12(a5) # 2000000c <uart_ctrl>
+ 280:	00c6a023          	sw	a2,0(a3)
+ 284:	200006b7          	lui	a3,0x20000
+ 288:	0106aa03          	lw	s4,16(a3) # 20000010 <LOAD_VALUE>
+ 28c:	200006b7          	lui	a3,0x20000
+ 290:	0146a403          	lw	s0,20(a3) # 20000014 <TIMER_STATUS>
+ 294:	27100693          	li	a3,625
+ 298:	00d72023          	sw	a3,0(a4)
+ 29c:	00092937          	lui	s2,0x92
+ 2a0:	00100713          	li	a4,1
+ 2a4:	00e7a023          	sw	a4,0(a5)
+ 2a8:	00000493          	li	s1,0
+ 2ac:	7c090913          	add	s2,s2,1984 # 927c0 <_sidata+0x924e8>
+ 2b0:	00100993          	li	s3,1
+ 2b4:	00148493          	add	s1,s1,1
+ 2b8:	00048513          	mv	a0,s1
+ 2bc:	ef5ff0ef          	jal	1b0 <uart_puts_hex>
+ 2c0:	012a2023          	sw	s2,0(s4)
+ 2c4:	01342023          	sw	s3,0(s0)
+ 2c8:	00042783          	lw	a5,0(s0)
+ 2cc:	1007f793          	and	a5,a5,256
+ 2d0:	fe078ce3          	beqz	a5,2c8 <main+0x80>
+ 2d4:	fe1ff06f          	j	2b4 <main+0x6c>
 
 Disassembly of section .data:
 
