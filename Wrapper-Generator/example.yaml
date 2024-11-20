@@ -1,0 +1,140 @@
+info:
+  name: ahbl_uart_tx
+  description: AHB-Lite Wrapper for UART Transmitter
+  repo: <repo_url>
+  owner: <owner>
+  license: Apache 2.0
+  author: <author>
+  email: <email>
+  version: 1.0
+  date: 2024-11-20
+  category: digital
+  tags:
+    - uart
+    - ahbl
+    - communication
+  bus:
+    - ahbl
+  type: soft
+  status: verified
+
+clock:
+  name: HCLK
+
+reset:
+  name: HRESETn
+  level: 0
+
+ports:
+  - name: HCLK
+    width: 1
+    direction: input
+    description: AHB-Lite clock signal
+  - name: HRESETn
+    width: 1
+    direction: input
+    description: AHB-Lite reset signal, active low
+  - name: HADDR
+    width: 32
+    direction: input
+    description: AHB-Lite address bus
+  - name: HTRANS
+    width: 2
+    direction: input
+    description: AHB-Lite transfer type
+  - name: HWRITE
+    width: 1
+    direction: input
+    description: AHB-Lite write signal
+  - name: HSIZE
+    width: 3
+    direction: input
+    description: AHB-Lite transfer size
+  - name: HWDATA
+    width: 32
+    direction: input
+    description: AHB-Lite write data bus
+  - name: HSEL
+    width: 1
+    direction: input
+    description: AHB-Lite select signal
+  - name: HREADY
+    width: 1
+    direction: input
+    description: AHB-Lite ready signal
+  - name: HRDATA
+    width: 32
+    direction: output
+    description: AHB-Lite read data bus
+  - name: HREADYOUT
+    width: 1
+    direction: output
+    description: AHB-Lite ready out signal
+  - name: tx
+    width: 1
+    direction: output
+    description: UART transmitter output signal
+
+registers:
+  - name: CTRL
+    size: 2
+    offset: 0x00
+    mode: rw
+    description: Control register
+    fields:
+      - name: en
+        bit_offset: 0
+        bit_width: 1
+        description: UART enable
+      - name: start
+        bit_offset: 1
+        bit_width: 1
+        description: Start transmission
+  - name: BAUDDIV
+    size: 16
+    offset: 0x04
+    mode: rw
+    description: Baud rate divisor register
+  - name: STATUS
+    size: 1
+    offset: 0x08
+    mode: r
+    description: Status register
+  - name: DATA
+    size: 8
+    offset: 0x0C
+    mode: rw
+    description: Data register for transmission
+
+flags:
+  - name: done
+    port: done
+    description: Transmission complete flag
+
+external_interface:
+  - name: tx
+    port: tx
+    direction: output
+    width: 1
+    description: UART transmitter output signal
+
+submodule:
+  name: uart_tx
+  description: UART transmitter core
+  ports:
+    - name: clk
+      connection: HCLK
+    - name: rst_n
+      connection: HRESETn
+    - name: en
+      connection: CTRL_REG[0]
+    - name: start
+      connection: CTRL_REG[1]
+    - name: data
+      connection: DATA_REG
+    - name: baud_div
+      connection: BAUDDIV_REG
+    - name: tx
+      connection: tx
+    - name: done
+      connection: done
