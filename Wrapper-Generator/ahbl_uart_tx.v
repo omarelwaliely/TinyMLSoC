@@ -3,7 +3,7 @@
 /*
     ahbl_uart_tx_AHBL Wrapper
     Description: AHB-Lite Wrapper for UART Transmitter
-    Auto-generated on 2024-11-20 04:53:05
+    Auto-generated on 2024-11-20 12:11:06
 */
 
 module ahbl_uart_tx (
@@ -19,15 +19,49 @@ module ahbl_uart_tx (
     input  wire        HREADY,
     output wire [31:0] HRDATA,
     output wire        HREADYOUT,
-    output wire        tx
+    output wire tx
 );
 
-    // Register offsets
-    localparam CTRL_REG_OFF = 32'h00;
-    localparam BAUDDIV_REG_OFF = 32'h04;
-    localparam STATUS_REG_OFF = 32'h08;
-    localparam DATA_REG_OFF = 32'h0C;
+    // Sticky Signals
+    reg [31:0] HADDR_d;
+    reg [1:0] HTRANS_d;
+    reg HWRITE_d;
+    reg HSEL_d;
+    reg tx_d;
 
+    // Sticky Logic
+    always @(posedge HCLK or negedge HRESETn) begin
+        if (~HRESETn)
+            HADDR_d <= 32'b0;
+        else
+            HADDR_d <= HADDR;
+    end
+    always @(posedge HCLK or negedge HRESETn) begin
+        if (~HRESETn)
+            HTRANS_d <= 2'b0;
+        else
+            HTRANS_d <= HTRANS;
+    end
+    always @(posedge HCLK or negedge HRESETn) begin
+        if (~HRESETn)
+            HWRITE_d <= 1'b0;
+        else
+            HWRITE_d <= HWRITE;
+    end
+    always @(posedge HCLK or negedge HRESETn) begin
+        if (~HRESETn)
+            HSEL_d <= 1'b0;
+        else
+            HSEL_d <= HSEL;
+    end
+    always @(posedge HCLK or negedge HRESETn) begin
+        if (~HRESETn)
+            tx_d <= 1'b0;
+        else
+            tx_d <= tx;
+    end
+
+    // Address phase signals
     reg [31:0] HADDR_d;
     reg [1:0]  HTRANS_d;
     reg        HWRITE_d, HSEL_d;
@@ -60,6 +94,12 @@ module ahbl_uart_tx (
     wire BAUDDIV_sel = (HADDR_d[23:0] == BAUDDIV_REG_OFF);
     wire STATUS_sel = (HADDR_d[23:0] == STATUS_REG_OFF);
     wire DATA_sel = (HADDR_d[23:0] == DATA_REG_OFF);
+
+    // Register Offsets
+    localparam CTRL_REG_OFF = 32'h00;
+    localparam BAUDDIV_REG_OFF = 32'h04;
+    localparam STATUS_REG_OFF = 32'h08;
+    localparam DATA_REG_OFF = 32'h0C;
 
     // Register Logic
     always @(posedge HCLK or negedge HRESETn) begin

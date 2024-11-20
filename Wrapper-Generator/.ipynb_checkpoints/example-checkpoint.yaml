@@ -30,50 +30,62 @@ ports:
     width: 1
     direction: input
     description: AHB-Lite clock signal
+    sticky: false
   - name: HRESETn
     width: 1
     direction: input
     description: AHB-Lite reset signal, active low
+    sticky: false
   - name: HADDR
     width: 32
     direction: input
     description: AHB-Lite address bus
+    sticky: true
   - name: HTRANS
     width: 2
     direction: input
     description: AHB-Lite transfer type
+    sticky: true
   - name: HWRITE
     width: 1
     direction: input
     description: AHB-Lite write signal
+    sticky: true
   - name: HSIZE
     width: 3
     direction: input
     description: AHB-Lite transfer size
+    sticky: false
   - name: HWDATA
     width: 32
     direction: input
     description: AHB-Lite write data bus
+    sticky: false
   - name: HSEL
     width: 1
     direction: input
     description: AHB-Lite select signal
+    sticky: true
   - name: HREADY
     width: 1
     direction: input
     description: AHB-Lite ready signal
+    sticky: false
   - name: HRDATA
     width: 32
     direction: output
     description: AHB-Lite read data bus
+    sticky: false
   - name: HREADYOUT
     width: 1
     direction: output
     description: AHB-Lite ready out signal
+    sticky: false
   - name: tx
     width: 1
     direction: output
     description: UART transmitter output signal
+    sticky: true
 
 registers:
   - name: CTRL
@@ -110,6 +122,7 @@ flags:
   - name: done
     port: done
     description: Transmission complete flag
+    sticky: false
 
 external_interface:
   - name: tx
@@ -117,6 +130,7 @@ external_interface:
     direction: output
     width: 1
     description: UART transmitter output signal
+    sticky: true
 
 submodule:
   name: uart_tx
