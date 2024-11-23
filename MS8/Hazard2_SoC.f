@@ -17,3 +17,4 @@ ahbl_timer.v
 apb.v
 apb_slave.v
 apb2ahbl.v
+apb_gpio.v

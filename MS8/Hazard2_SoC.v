@@ -49,6 +49,10 @@ module Hazard2_SoC (
     wire [31:0]  GPIO_OE_A;
     wire [31:0]   GPIO_IN_A;
 
+    wire [31:0]  GPIO_OUT_D;
+    wire [31:0]  GPIO_OE_D;
+    wire [31:0]   GPIO_IN_D;
+
     wire [31:0]  GPIO_OUT;
     wire [31:0]  GPIO_OE;
     wire [31:0]  GPIO_IN;
@@ -250,7 +254,10 @@ module Hazard2_SoC (
         .PADDR(PADDR),
         .PENABLE(PENABLE),
         .PREADY(PREADY),
-        .PRDATA(PRDATA)
+        .PRDATA(PRDATA),
+        .GPIO_IN(GPIO_IN_D),
+        .GPIO_OUT(GPIO_OUT_D),
+        .GPIO_OE(GPIO_OE_D)
     );
     // Slave 3 does not exist
     //assign S3_HREADYOUT = 1'b1;
