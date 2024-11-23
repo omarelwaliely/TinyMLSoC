@@ -1,0 +1,184 @@
+info:
+  name: ahbl_i2s
+  description: AHB-Lite Wrapper for I2S Module
+  repo: <repo_url>
+  owner: <owner>
+  license: Apache 2.0
+  author: <author>
+  email: <email>
+  version: 1.0
+  date: 2024-11-20
+  category: digital
+  tags:
+    - i2s
+    - ahbl
+    - audio
+  bus:
+    - ahbl
+  type: soft
+  status: verified
+
+clock:
+  name: HCLK
+
+reset:
+  name: HRESETn
+  level: 0
+
+ports:
+  - name: HCLK
+    width: 1
+    direction: input
+    description: AHB-Lite clock signal
+    sticky: false
+  - name: HRESETn
+    width: 1
+    direction: input
+    description: AHB-Lite reset signal, active low
+    sticky: false
+  - name: HADDR
+    width: 32
+    direction: input
+    description: AHB-Lite address bus
+    sticky: true
+  - name: HTRANS
+    width: 2
+    direction: input
+    description: AHB-Lite transfer type
+    sticky: true
+  - name: HWRITE
+    width: 1
+    direction: input
+    description: AHB-Lite write signal
+    sticky: true
+  - name: HSIZE
+    width: 3
+    direction: input
+    description: AHB-Lite transfer size
+    sticky: false
+  - name: HWDATA
+    width: 32
+    direction: input
+    description: AHB-Lite write data bus
+    sticky: false
+  - name: HSEL
+    width: 1
+    direction: input
+    description: AHB-Lite select signal
+    sticky: true
+  - name: HREADY
+    width: 1
+    direction: input
+    description: AHB-Lite ready signal
+    sticky: false
+  - name: HRDATA
+    width: 32
+    direction: output
+    description: AHB-Lite read data bus
+    sticky: false
+  - name: HREADYOUT
+    width: 1
+    direction: output
+    description: AHB-Lite ready out signal
+    sticky: false
+  - name: SD
+    width: 1
+    direction: input
+    description: Serial data input
+    sticky: false
+  - name: SCK
+    width: 1
+    direction: output
+    description: Serial clock output
+    sticky: true
+  - name: WS
+    width: 1
+    direction: output
+    description: Word select signal
+    sticky: true
+  - name: sample
+    width: 32
+    direction: output
+    description: I2S sample data
+    sticky: false
+  - name: rdy
+    width: 1
+    direction: output
+    description: I2S ready flag
+    sticky: false
+
+registers:
+  - name: CTRL
+    size: 1
+    offset: 0x00
+    mode: rw
+    description: Control register for I2S
+    fields:
+      - name: mode
+        bit_offset: 0
+        bit_width: 1
+        description: I2S mode selection
+  - name: STATUS
+    size: 1
+    offset: 0x04
+    mode: r
+    description: Status register for I2S
+    fields:
+      - name: rdy
+        bit_offset: 0
+        bit_width: 1
+        description: Ready flag status
+  - name: SAMPLE
+    size: 32
+    offset: 0x08
+    mode: r
+    description: Current I2S sample data
+
+flags:
+  - name: rdy
+    port: rdy
+    description: Ready flag indicating I2S module readiness
+    sticky: false
+
+external_interface:
+  - name: SD
+    port: SD
+    direction: input
+    width: 1
+    description: Serial data input
+    sticky: false
+  - name: SCK
+    port: SCK
+    direction: output
+    width: 1
+    description: Serial clock output
+    sticky: true
+  - name: WS
+    port: WS
+    direction: output
+    width: 1
+    description: Word select signal
+    sticky: true
+
+submodule:
+  name: i2s
+  description: I2S audio interface module
+  ports:
+    - name: clk
+      connection: HCLK
+    - name: rst_n
+      connection: HRESETn
+    - name: mode
+      connection: CTRL_REG[0]
+    - name: tick
+      connection: HWDATA[0]
+    - name: sample
+      connection: SAMPLE_REG
+    - name: rdy
+      connection: STATUS_REG[0]
+    - name: SD
+      connection: SD
+    - name: SCK
+      connection: SCK
+    - name: WS
+      connection: WS

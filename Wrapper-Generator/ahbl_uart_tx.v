@@ -1,12 +1,12 @@
 `default_nettype none
 
 /*
-    ahbl_uart_tx_AHBL Wrapper
-    Description: AHB-Lite Wrapper for UART Transmitter
-    Auto-generated on 2024-11-20 12:11:06
+    ahbl_i2s_AHBL Wrapper
+    Description: AHB-Lite Wrapper for I2S Module
+    Auto-generated on 2024-11-20 12:21:41
 */
 
-module ahbl_uart_tx (
+module ahbl_i2s (
     // AHB-Lite Interface
     input  wire        HCLK,
     input  wire        HRESETn,
@@ -19,7 +19,11 @@ module ahbl_uart_tx (
     input  wire        HREADY,
     output wire [31:0] HRDATA,
     output wire        HREADYOUT,
-    output wire tx
+    input wire SD,
+    output wire SCK,
+    output wire WS,
+    output wire [31:0] sample,
+    output wire rdy
 );
 
     // Sticky Signals
@@ -27,7 +31,8 @@ module ahbl_uart_tx (
     reg [1:0] HTRANS_d;
     reg HWRITE_d;
     reg HSEL_d;
-    reg tx_d;
+    reg SCK_d;
+    reg WS_d;
 
     // Sticky Logic
     always @(posedge HCLK or negedge HRESETn) begin
@@ -56,9 +61,15 @@ module ahbl_uart_tx (
     end
     always @(posedge HCLK or negedge HRESETn) begin
         if (~HRESETn)
-            tx_d <= 1'b0;
+            SCK_d <= 1'b0;
         else
-            tx_d <= tx;
+            SCK_d <= SCK;
+    end
+    always @(posedge HCLK or negedge HRESETn) begin
+        if (~HRESETn)
+            WS_d <= 1'b0;
+        else
+            WS_d <= WS;
     end
 
     // Address phase signals
@@ -84,64 +95,50 @@ module ahbl_uart_tx (
     wire ahbl_re = HTRANS_d[1] & HSEL_d & ~HWRITE_d;
 
     // Register Declarations
-    reg [1:0] CTRL_REG;
-    reg [15:0] BAUDDIV_REG;
+    reg [0:0] CTRL_REG;
     reg [0:0] STATUS_REG;
-    reg [7:0] DATA_REG;
+    reg [31:0] SAMPLE_REG;
 
     // Signal Selection Logic
     wire CTRL_sel = (HADDR_d[23:0] == CTRL_REG_OFF);
-    wire BAUDDIV_sel = (HADDR_d[23:0] == BAUDDIV_REG_OFF);
     wire STATUS_sel = (HADDR_d[23:0] == STATUS_REG_OFF);
-    wire DATA_sel = (HADDR_d[23:0] == DATA_REG_OFF);
+    wire SAMPLE_sel = (HADDR_d[23:0] == SAMPLE_REG_OFF);
 
     // Register Offsets
     localparam CTRL_REG_OFF = 32'h00;
-    localparam BAUDDIV_REG_OFF = 32'h04;
-    localparam STATUS_REG_OFF = 32'h08;
-    localparam DATA_REG_OFF = 32'h0C;
+    localparam STATUS_REG_OFF = 32'h04;
+    localparam SAMPLE_REG_OFF = 32'h08;
 
     // Register Logic
     always @(posedge HCLK or negedge HRESETn) begin
         if (~HRESETn)
             CTRL_REG <= 0; // Default reset value
         else if (ahbl_we & CTRL_sel)
-            CTRL_REG <= HWDATA[1:0];
-    end
-    always @(posedge HCLK or negedge HRESETn) begin
-        if (~HRESETn)
-            BAUDDIV_REG <= 0; // Default reset value
-        else if (ahbl_we & BAUDDIV_sel)
-            BAUDDIV_REG <= HWDATA[15:0];
+            CTRL_REG <= HWDATA[0:0];
     end
     // STATUS_REG is read-only
-    always @(posedge HCLK or negedge HRESETn) begin
-        if (~HRESETn)
-            DATA_REG <= 0; // Default reset value
-        else if (ahbl_we & DATA_sel)
-            DATA_REG <= HWDATA[7:0];
-    end
+    // SAMPLE_REG is read-only
 
     // Read Data Logic
     assign HRDATA =
-        CTRL_sel ? {32-2'b0, CTRL_REG} :
-        BAUDDIV_sel ? {32-16'b0, BAUDDIV_REG} :
+        CTRL_sel ? {32-1'b0, CTRL_REG} :
         STATUS_sel ? {32-1'b0, STATUS_REG} :
-        DATA_sel ? {32-8'b0, DATA_REG} :
+        SAMPLE_sel ? {32-32'b0, SAMPLE_REG} :
         32'hBADDBEEF;
 
     assign HREADYOUT = 1'b1;
 
-    // Submodule Instance: uart_tx
-    uart_tx uart_tx_instance (
+    // Submodule Instance: i2s
+    i2s i2s_instance (
         .clk(HCLK),
         .rst_n(HRESETn),
-        .en(CTRL_REG[0]),
-        .start(CTRL_REG[1]),
-        .data(DATA_REG),
-        .baud_div(BAUDDIV_REG),
-        .tx(tx),
-        .done(done)
+        .mode(CTRL_REG[0]),
+        .tick(HWDATA[0]),
+        .sample(SAMPLE_REG),
+        .rdy(STATUS_REG[0]),
+        .SD(SD),
+        .SCK(SCK),
+        .WS(WS)
     );
 
 endmodule
