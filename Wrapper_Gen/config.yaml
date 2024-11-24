@@ -1,0 +1,21 @@
+MODULE_NAME: i2s_wrapper
+COMMON_PORTS:
+  - clk
+  - reset
+REGS:
+  - Name: SAMPLE_REG
+    TYPE: RO
+    OFF: 0x0
+    REGISTERED: True
+    SIZE: 32
+    STICKY: False
+    IFC: sample
+    wr_cntr: rdy
+  - Name: CONTROL_REG
+    TYPE: RW
+    OFF: 0x4
+    REGISTERED: True
+    SIZE: 16
+    STICKY: False
+    IFC: control
+    wr_cntr: ctrl

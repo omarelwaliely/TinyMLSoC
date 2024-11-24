@@ -15,7 +15,6 @@ module ahbl_i2s_rx (
 
     input  wire        rx,      
     output wire        ws,      
-    output wire        i2s_clk, 
     output wire [63:0] rx_data   
 );
 
@@ -29,8 +28,9 @@ module ahbl_i2s_rx (
     reg        HWRITE_d;
     reg        HSEL_d;
     reg [1:0]  MODE_reg;  
-    reg [31:0]  DATA_reg;  
-
+    reg [31:0]  DATA_reg; 
+    reg ready_reg; 
+    wire        i2s_clk;
 
     wire MODE_sel = (HADDR_d[7:0] == MODE_ADDR);
     //wire DATA_sel = (HADDR_d[23:0] == DATA_ADDR);
@@ -69,13 +69,16 @@ module ahbl_i2s_rx (
     assign HREADYOUT = 1'b1;
 
     // I2S Receiver Instance
-    i2s_rx i2s_receiver (
-        .clk(HCLK),
-        .rst_n(HRESETn),
-        .rx(rx),
-        .ws(ws),
-        .i2s_clk(i2s_clk),
-        .rx_data(rx_data)
-    );
+    i2s i2s_rec(
+    .clk(HCLK),
+    .rst_n(HRESETn),
+    .mode(1'b0),
+    .tick(),
+    .sample(),
+    .rdy(ready_reg),
+    .SD(),
+    .SCK(i2s_clk),
+    .WS(ws)
+);
 
 endmodule

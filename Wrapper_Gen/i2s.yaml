@@ -1,0 +1,56 @@
+MODULE_NAME: i2s
+PARAMETERS:
+  - Name: WSZ
+    DEFAULT: 32
+    DESCRIPTION: Word size for the I2S data
+
+COMMON_PORTS:
+  - clk
+  - rst_n
+
+REGS:
+  - Name: shifter
+    TYPE: RW
+    REGISTERED: True
+    SIZE: WSZ
+    DESCRIPTION: Shift register for the serial data
+  - Name: cntr
+    TYPE: RW
+    REGISTERED: True
+    SIZE: 6
+    DESCRIPTION: Counter for clock and word select
+  - Name: ws
+    TYPE: RW
+    REGISTERED: True
+    SIZE: 1
+    DESCRIPTION: Word select signal
+
+INPUTS:
+  - Name: mode
+    SIZE: 1
+    DESCRIPTION: Mode for determining clock divider behavior
+  - Name: tick
+    SIZE: 1
+    DESCRIPTION: Clock tick signal
+  - Name: SD
+    SIZE: 1
+    DESCRIPTION: Serial data input
+
+OUTPUTS:
+  - Name: sample
+    SIZE: WSZ
+    DESCRIPTION: Parallel word output from the shift register
+  - Name: rdy
+    SIZE: 1
+    DESCRIPTION: Ready signal indicating the sample is valid
+  - Name: SCK
+    SIZE: 1
+    DESCRIPTION: Serial clock output
+  - Name: WS
+    SIZE: 1
+    DESCRIPTION: Word select output
+
+DESCRIPTION: >
+  The I2S module implements a serial-to-parallel converter with a configurable
+  word size, clock signals (SCK and WS), and ready output.
+  It shifts in serial data (SD) and outputs the parallel word (sample).
