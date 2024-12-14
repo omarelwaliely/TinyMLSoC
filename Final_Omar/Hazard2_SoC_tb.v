@@ -25,12 +25,6 @@ module Hazard2_SoC_tb;
     forever #3 HCLK = ~HCLK; // 6 MHz clock 
     end
 
-    // Reset generation
-    initial begin
-        HRESETn = 0;
-        #20 HRESETn = 1;
-    end
-
 
     i2s_test tb (
         .WS(ws),
@@ -56,6 +50,13 @@ module Hazard2_SoC_tb;
         .HRDATA(HRDATA)
     );
 
+     serial_terminal terminal (
+        .clk(HCLK),             
+        .rst_n(HRESETn),           
+        .rx(UART_TX),           
+        .baud_div(3)  
+    );
+    
     initial begin
         HRESETn = 0;
         #47;

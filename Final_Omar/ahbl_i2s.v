@@ -34,9 +34,9 @@ module ahbl_i2s (
     wire tick, rdy, count;
     wire [31:0] sample;
 
-    wire CTRL_REG_SEL       = (HADDR_d[23:0] == CTRL_REG_OFF);
-    wire DONE_REG_SEL       = (HADDR_d[23:0] == DONE_REG_OFF);
-    wire DATA_REG_SEL       = (HADDR_d[23:0] == DATA_REG_OFF);
+    wire CTRL_REG_SEL       = (HADDR_d[7:0] == CTRL_REG_OFF);
+    wire DONE_REG_SEL       = (HADDR_d[7:0] == DONE_REG_OFF);
+    wire DATA_REG_SEL       = (HADDR_d[7:0] == DATA_REG_OFF);
 
     
 

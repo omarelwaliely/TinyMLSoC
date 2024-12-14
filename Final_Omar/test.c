@@ -54,6 +54,13 @@ void uart_puts_hex(int num) {
     uart_puts(hex_string); // Send the hex string with UART
 }
 
+unsigned int reverse_bits(unsigned int num) {
+    unsigned int reversed = 0;
+    for (int i = 0; i < 32; i++) {
+        reversed |= ((num >> i) & 0x1) << (31 - i);
+    }
+    return reversed;
+}
 
 int main() {
    *i2s_en = 0x00000009;
@@ -65,19 +72,14 @@ int main() {
     // uart_putc('h');
     while (1) {
         if (*i2s_done == 0x00000003){
-            uart_putc('h');
-        }
-        else{
-            uart_putc('c');
-        }
+            x = *i2s_data;
+            c1 = (x >> 24) & 0xFF;
+            c2 = (x >> 16) & 0xFF;
+            //uart_putc(c1);
+            //uart_putc(c2);
+            uart_puts_hex(x);
 
-        // x = *i2s_data;
-
-        //c1 = (x >> 24) & 0xFF;
-        //c2 = (x >> 16) & 0xFF;
-        //uart_puts_hex(x);
-        //uart_putc('h'); 
-        //uart_putc('h'); 
+        }
     }
     return 0;
 }

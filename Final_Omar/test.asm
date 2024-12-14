@@ -38,7 +38,7 @@ Disassembly of section .text:
   78:	00000f13          	li	t5,0
   7c:	00000f93          	li	t6,0
   80:	00000517          	auipc	a0,0x0
-  84:	23850513          	addi	a0,a0,568 # 2b8 <_sidata>
+  84:	28850513          	addi	a0,a0,648 # 308 <_sidata>
   88:	20000597          	auipc	a1,0x20000
   8c:	f7858593          	addi	a1,a1,-136 # 20000000 <uart_data>
   90:	20000617          	auipc	a2,0x20000
@@ -65,14 +65,14 @@ Disassembly of section .text:
   cc:	feb54ce3          	blt	a0,a1,c4 <loop_init_bss>
 
 000000d0 <end_init_bss>:
-  d0:	178000ef          	jal	248 <main>
+  d0:	1ac000ef          	jal	27c <main>
 
 000000d4 <loop>:
   d4:	0000006f          	j	d4 <loop>
 
 000000d8 <delay>:
   d8:	000017b7          	lui	a5,0x1
-  dc:	77078793          	addi	a5,a5,1904 # 1770 <_sidata+0x14b8>
+  dc:	77078793          	addi	a5,a5,1904 # 1770 <_sidata+0x1468>
   e0:	02f50533          	mul	a0,a0,a5
   e4:	200007b7          	lui	a5,0x20000
   e8:	0107a683          	lw	a3,16(a5) # 20000010 <LOAD_VALUE>
@@ -149,7 +149,7 @@ Disassembly of section .text:
  1e4:	ff0710e3          	bne	a4,a6,1c4 <uart_puts_hex+0x14>
  1e8:	000017b7          	lui	a5,0x1
  1ec:	00414683          	lbu	a3,4(sp)
- 1f0:	a0d78793          	addi	a5,a5,-1523 # a0d <_sidata+0x755>
+ 1f0:	a0d78793          	addi	a5,a5,-1523 # a0d <_sidata+0x705>
  1f4:	00010723          	sb	zero,14(sp)
  1f8:	00f11623          	sh	a5,12(sp)
  1fc:	04068263          	beqz	a3,240 <uart_puts_hex+0x90>
@@ -172,35 +172,57 @@ Disassembly of section .text:
  240:	01010113          	addi	sp,sp,16
  244:	00008067          	ret
 
-00000248 <main>:
- 248:	200007b7          	lui	a5,0x20000
- 24c:	0207a683          	lw	a3,32(a5) # 20000020 <i2s_en>
- 250:	200007b7          	lui	a5,0x20000
- 254:	0087a783          	lw	a5,8(a5) # 20000008 <uart_bauddiv>
- 258:	20000737          	lui	a4,0x20000
- 25c:	00c72583          	lw	a1,12(a4) # 2000000c <uart_ctrl>
- 260:	00900813          	li	a6,9
- 264:	0106a023          	sw	a6,0(a3)
- 268:	20000537          	lui	a0,0x20000
- 26c:	20000637          	lui	a2,0x20000
- 270:	20000737          	lui	a4,0x20000
- 274:	00300693          	li	a3,3
- 278:	00052803          	lw	a6,0(a0) # 20000000 <uart_data>
- 27c:	01c62603          	lw	a2,28(a2) # 2000001c <i2s_done>
- 280:	00472703          	lw	a4,4(a4) # 20000004 <uart_status>
- 284:	00d7a023          	sw	a3,0(a5)
- 288:	00100793          	li	a5,1
- 28c:	00f5a023          	sw	a5,0(a1)
- 290:	06300513          	li	a0,99
- 294:	00062783          	lw	a5,0(a2)
- 298:	fed78ee3          	beq	a5,a3,294 <main+0x4c>
- 29c:	00072783          	lw	a5,0(a4)
- 2a0:	fe078ee3          	beqz	a5,29c <main+0x54>
- 2a4:	00a82023          	sw	a0,0(a6)
- 2a8:	0005a783          	lw	a5,0(a1)
- 2ac:	0027e793          	ori	a5,a5,2
- 2b0:	00f5a023          	sw	a5,0(a1)
- 2b4:	fe1ff06f          	j	294 <main+0x4c>
+00000248 <reverse_bits>:
+ 248:	00050613          	mv	a2,a0
+ 24c:	00000713          	li	a4,0
+ 250:	00000513          	li	a0,0
+ 254:	01f00813          	li	a6,31
+ 258:	02000593          	li	a1,32
+ 25c:	00e657b3          	srl	a5,a2,a4
+ 260:	40e806b3          	sub	a3,a6,a4
+ 264:	0017f793          	andi	a5,a5,1
+ 268:	00d797b3          	sll	a5,a5,a3
+ 26c:	00170713          	addi	a4,a4,1
+ 270:	00f56533          	or	a0,a0,a5
+ 274:	feb714e3          	bne	a4,a1,25c <reverse_bits+0x14>
+ 278:	00008067          	ret
+
+0000027c <main>:
+ 27c:	200007b7          	lui	a5,0x20000
+ 280:	0207a603          	lw	a2,32(a5) # 20000020 <i2s_en>
+ 284:	200007b7          	lui	a5,0x20000
+ 288:	fe010113          	addi	sp,sp,-32
+ 28c:	0087a703          	lw	a4,8(a5) # 20000008 <uart_bauddiv>
+ 290:	200007b7          	lui	a5,0x20000
+ 294:	00812c23          	sw	s0,24(sp)
+ 298:	00912a23          	sw	s1,20(sp)
+ 29c:	01212823          	sw	s2,16(sp)
+ 2a0:	00c7a783          	lw	a5,12(a5) # 2000000c <uart_ctrl>
+ 2a4:	00112e23          	sw	ra,28(sp)
+ 2a8:	00900593          	li	a1,9
+ 2ac:	00b62023          	sw	a1,0(a2)
+ 2b0:	200006b7          	lui	a3,0x20000
+ 2b4:	00300413          	li	s0,3
+ 2b8:	01c6a483          	lw	s1,28(a3) # 2000001c <i2s_done>
+ 2bc:	00872023          	sw	s0,0(a4)
+ 2c0:	00100713          	li	a4,1
+ 2c4:	00e7a023          	sw	a4,0(a5)
+ 2c8:	20000937          	lui	s2,0x20000
+ 2cc:	0004a783          	lw	a5,0(s1)
+ 2d0:	fe879ee3          	bne	a5,s0,2cc <main+0x50>
+ 2d4:	01892783          	lw	a5,24(s2) # 20000018 <i2s_data>
+ 2d8:	0007a783          	lw	a5,0(a5)
+ 2dc:	00f12623          	sw	a5,12(sp)
+ 2e0:	00c12783          	lw	a5,12(sp)
+ 2e4:	0187d793          	srli	a5,a5,0x18
+ 2e8:	00f10523          	sb	a5,10(sp)
+ 2ec:	00c12783          	lw	a5,12(sp)
+ 2f0:	4107d793          	srai	a5,a5,0x10
+ 2f4:	0ff7f793          	zext.b	a5,a5
+ 2f8:	00f105a3          	sb	a5,11(sp)
+ 2fc:	00c12503          	lw	a0,12(sp)
+ 300:	eb1ff0ef          	jal	1b0 <uart_puts_hex>
+ 304:	fc9ff06f          	j	2cc <main+0x50>
 
 Disassembly of section .data:
 

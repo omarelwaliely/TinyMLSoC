@@ -12,12 +12,12 @@ module i2s(
 reg BCLK_d, WS_d;
 localparam size = 32;
 reg [size -1 : 0] shift_reg;
-reg [5:0] WS_cntr;
+reg [6:0] WS_cntr; 
 reg [1:0] BCLK_cntr;
 reg [1:0] done_cntr;
 
 wire done_cntr_zero = done_cntr == 2'b00;
-wire WS_cntr_zero = WS_cntr == 6'b111111;
+wire WS_cntr_zero = WS_cntr == 7'b1000000;
 wire cntr_two = BCLK_cntr == 2'b10;
 
 // WS

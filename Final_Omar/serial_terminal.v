@@ -1,4 +1,4 @@
-//`define DETAILS 1
+`define DETAILS 1
 
 module serial_terminal (
     input wire clk,             // System clock

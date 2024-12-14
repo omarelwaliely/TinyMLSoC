@@ -111,24 +111,24 @@ module Hazard2_SoC (
     );
 
 
-    ahbl_gpio GPIO (
-        .HCLK(HCLK),
-        .HRESETn(HRESETn),
+    // ahbl_gpio GPIO (
+    //     .HCLK(HCLK),
+    //     .HRESETn(HRESETn),
 
-        .HADDR(HADDR),
-        .HTRANS(HTRANS),
-        .HSIZE(HSIZE),
-        .HWRITE(HWRITE),
-        .HREADY(HREADY),
-        .HSEL(S2_HSEL),
-        .HWDATA(HWDATA),
-        .HREADYOUT(S2_HREADYOUT),
-        .HRDATA(S2_HRDATA),
+    //     .HADDR(HADDR),
+    //     .HTRANS(HTRANS),
+    //     .HSIZE(HSIZE),
+    //     .HWRITE(HWRITE),
+    //     .HREADY(HREADY),
+    //     .HSEL(S2_HSEL),
+    //     .HWDATA(HWDATA),
+    //     .HREADYOUT(S2_HREADYOUT),
+    //     .HRDATA(S2_HRDATA),
 
-        .GPIO_IN(GPIO_IN),
-        .GPIO_OUT(GPIO_OUT),
-        .GPIO_OE(GPIO_OE)
-    );
+    //     .GPIO_IN(GPIO_IN),
+    //     .GPIO_OUT(GPIO_OUT),
+    //     .GPIO_OE(GPIO_OE)
+    // );
 
 
     ahbl_ram #(.SIZE(8*1024)) PMEM (
@@ -285,11 +285,11 @@ module Hazard2_SoC (
         .S4_HREADYOUT(S4_HREADYOUT)
     );
 
-    ahbl_gpio_splitter #(.A(3'h0), 
-                        .B(3'h1),
-                        .C(3'h2),
-                        .timer(3'h3),
-                        .i2s(3'h4)
+    ahbl_gpio_splitter #(.A(4'h0), 
+                        .B(4'h1),
+                        .C(4'h2),
+                        .timer(4'h3),
+                        .i2s(4'h4)
     ) GPIO_SPLITTER (
         .HCLK(HCLK),
         .HRESETn(HRESETn),

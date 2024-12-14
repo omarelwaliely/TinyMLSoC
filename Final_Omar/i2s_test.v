@@ -29,7 +29,7 @@ module i2s_test (
             if (i == 31) begin
                 i <= 0;
                 j <= (j + 1) % 128;  // Reset j to 0 after reaching 7
-                $display("j: %d", j);
+                // $display("j: %d", j);
             end else begin
                 i <= i + 1;
             end
