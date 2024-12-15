@@ -71,7 +71,7 @@ module Hazard2_SoC_tb;
         wait(HRESETn == 1'b1);   
         @(posedge HCLK);         
         en = 1;    
-        #70000;  // Run simulation for 1000ns (1us) before stopping
+        #80000;  // Run simulation for 1000ns (1us) before stopping
         $finish; // End the simulation
     end
 

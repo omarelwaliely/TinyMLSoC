@@ -48,7 +48,7 @@ all: sim
 
 # Clean up generated files
 clean:
-	rm -f *.elf *.hex *.vvp *.asm *.o
+	rm -f $(filter-out i2s_test.hex, $(wildcard *.elf *.hex *.vvp *.asm *.o))
 
 
 runass: 

@@ -17,7 +17,10 @@ module ahbl_i2s (
 
     input  wire        SD,
     output wire        SCK,
-    output wire        WS
+    output wire        WS,
+
+    output wire full
+
 );
 
     localparam  CTRL_REG_OFF    = 'h00,
@@ -33,6 +36,16 @@ module ahbl_i2s (
 
     wire tick, rdy, count;
     wire [31:0] sample;
+
+    localparam DW = 32;  
+    localparam AW = 4;
+
+    reg rd,flush;
+    wire wr = rdy;
+    wire empty;
+    wire [DW-1:0]   rdata;
+    reg [DW-1:0]   wdata;
+    wire [AW-1:0]   level; //not really used in this case as far as I can tell 
 
     wire CTRL_REG_SEL       = (HADDR_d[7:0] == CTRL_REG_OFF);
     wire DONE_REG_SEL       = (HADDR_d[7:0] == DONE_REG_OFF);
@@ -82,28 +95,14 @@ module ahbl_i2s (
 
 
 
-    reg rdy_sync1, rdy_sync2;
-
-always @(posedge HCLK or negedge HRESETn) begin
-if (!HRESETn) begin
-    rdy_sync1 <= 1'b0;
-    rdy_sync2 <= 1'b0;
-end else begin
-    rdy_sync1 <= rdy;       // First stage
-    rdy_sync2 <= rdy_sync1; // Second stage
-end
-end
-
-
-
-always @(posedge HCLK or negedge HRESETn) begin
-if (!HRESETn)
-    DONE_REG <= 2'b00;
-else if (rdy_sync2)  // Prioritize `rdy`
-    DONE_REG <= {rdy_sync2, WS};
-else if (ahbl_re && DONE_REG_SEL)  // Clear `DONE_REG` on AHB read
-    DONE_REG <= {1'b0, WS};
-end
+    always @(posedge HCLK or negedge HRESETn) begin
+        if (!HRESETn)
+            DONE_REG <= 2'b00;
+        else if (rdy)
+            DONE_REG <= {rdy, WS};
+        else if (ahbl_re && DONE_REG_SEL)  // Clear `DONE_REG` on AHB read
+            DONE_REG <= {1'b0, WS};
+    end
 
     always@(posedge HCLK, negedge HRESETn) begin
         if(!HRESETn)
@@ -130,6 +129,43 @@ end
         .BCLK(SCK),
         .WS(WS)
     );
+
+
+
+    // fifo logic
+
+    //note wr is already assigned to rdy so when rdy it will know to begin writing
+
+    always @(posedge HCLK) begin
+        if(!HRESETn) begin
+            rd     <= 'h0;
+            flush    <= 'h00;
+            wdata    <= 'h0;
+        end
+    end
+
+    always@(posedge HCLK, negedge HRESETn) begin
+        if(wr) begin //note this will take the left and right sample, we can & with !WS to take the left sample only, Ill leave it this way for now
+            wdata = DATA_REG;
+        end
+    end
+
+    
+
+    //32 bit width 16 depth
+    aucohl_fifo #(DW, AW) fifo_inst ( 
+        .clk(HCLK),
+        .rst_n(HRESETn),
+        .rd(rd),
+        .wr(wr),
+        .flush(flush),
+        .wdata(wdata),
+        .empty(empty),
+        .full(full),
+        .rdata(rdata),
+        .level(level)
+    );
+
 
 
 endmodule
