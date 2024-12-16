@@ -16,7 +16,7 @@ module FRV_AHBL(
     wire        mem_rbusy;
     wire        mem_wbusy;
 
-    FemtoRV32 #(.ADDR_WIDTH(32)) CPU (
+    FemtoRV32 #(.ADDR_WIDTH(32),.E(0)) CPU (
         .clk(HCLK),
         .mem_addr(HADDR),
         .mem_wdata(HWDATA),
