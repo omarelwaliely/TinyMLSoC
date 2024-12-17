@@ -19,13 +19,15 @@ module ahbl_i2s (
     output wire        SCK,
     output wire        WS,
 
-    output wire full
+    output wire IRQ
 
 );
 
     localparam  CTRL_REG_OFF    = 'h00,
                 DONE_REG_OFF = 'h04,
-                DATA_REG_OFF = 'h08;
+                DATA_REG_OFF = 'h08,
+                FIFO_STATUS_REG_OFF = 'h0C, 
+                FIFO_DATA_REG_OFF = 'h10; 
 
     // store the address phase signals
     reg [31:0]  HADDR_d;
@@ -34,7 +36,7 @@ module ahbl_i2s (
     reg         HWRITE_d;
     reg         HSEL_d;
 
-    wire tick, rdy, count;
+    wire tick, rdy, count,full;
     wire [31:0] sample;
 
     localparam DW = 32;  
@@ -53,6 +55,10 @@ module ahbl_i2s (
     wire CTRL_REG_SEL       = (HADDR_d[7:0] == CTRL_REG_OFF);
     wire DONE_REG_SEL       = (HADDR_d[7:0] == DONE_REG_OFF);
     wire DATA_REG_SEL       = (HADDR_d[7:0] == DATA_REG_OFF);
+    wire FIFO_STATUS_REG_SEL       = (HADDR_d[7:0] == FIFO_STATUS_REG_OFF);
+    wire FIFO_DATA_REG_SEL       = (HADDR_d[7:0] == FIFO_DATA_REG_OFF);
+
+
 
     
 
@@ -79,6 +85,9 @@ module ahbl_i2s (
     reg [ 3:0]  CTRL_REG;
     reg [31:0]  DATA_REG;
     reg [1:0]  DONE_REG;
+    reg [31:0]  FIFO_DATA_REG;
+
+
 
 
     always @ (posedge HCLK or negedge HRESETn)
@@ -86,14 +95,22 @@ module ahbl_i2s (
             CTRL_REG <= 4'b0;
         else if(ahbl_we & CTRL_REG_SEL)
             CTRL_REG <= HWDATA[3:0];
+    
+    
 
     wire [31:0] user_CTRL_REG = {28'h0, CTRL_REG};
     wire [31:0] user_DONE_REG = {30'h0, DONE_REG};
+    wire [31:0] user_FIFO_STATUS_REG = {31'h0, empty};
+
 
 
     assign HRDATA = DATA_REG_SEL   ? DATA_REG             :  
                     CTRL_REG_SEL   ? user_CTRL_REG    :
                     DONE_REG_SEL   ? user_DONE_REG    :
+                    FIFO_STATUS_REG_SEL   ? user_FIFO_STATUS_REG    :
+                    FIFO_DATA_REG_SEL  ? FIFO_DATA_REG    :
+
+
                     32'hBADDBEEF;
 
 
@@ -126,6 +143,8 @@ module ahbl_i2s (
                     DATA_REG <= sample;
     end
 
+   
+
 
     assign HREADYOUT = 1'b1; // Always ready
 
@@ -154,24 +173,71 @@ module ahbl_i2s (
             flush    <= 'h00;
             wdata    <= 'h0;
         end
-        //REMOVE THE BELOW LATER THIS IS JUST SO I CAN TEST THE ISR. IT INSTA EMPTIES THE FIFO WE DONT WANT THAT
-        else begin
-            if(full) begin 
-                flush <= 1;
-            end
-            else if (flush) begin
-                flush <=0;
-            end
-        end
     end
 
     always@(posedge HCLK, negedge HRESETn) begin
-        if(wr) begin //note this will take the left and right sample, we can & with !WS to take the left sample only, Ill leave it this way for now
+        if(wr & !WS) begin //note this will take the left and right sample, we can & with !WS to take the left sample only, Ill leave it this way for now
             wdata = DATA_REG;
         end
     end
     
 
+
+    always@(posedge HCLK, negedge HRESETn) begin
+            if(!HRESETn) begin
+                FIFO_DATA_REG<=32'd0;
+            end
+            else begin
+                if (ahbl_re && FIFO_DATA_REG_SEL)begin
+                    rd<=1;
+                end
+                else begin
+                    FIFO_DATA_REG <= rdata;
+                    rd<=0;
+                end
+            end
+    end
+
+
+
+    //interrupt logic (I make it pulse once if full but for now the logic states that the interrupt wont occur again, until the fifo is empty then full)
+
+    reg fifo_full_d;       
+    reg fifo_was_empty; 
+    reg irq_reg;         
+
+    always @(posedge HCLK or negedge HRESETn) begin
+        if (!HRESETn) begin
+            fifo_was_empty <= 1'b1; 
+        end else if (empty) begin
+            fifo_was_empty <= 1'b1;
+        end else if (full) begin
+            fifo_was_empty <= 1'b0; 
+        end
+    end
+
+    always @(posedge HCLK or negedge HRESETn) begin
+        if (!HRESETn) begin
+            fifo_full_d <= 1'b0;
+        end else begin
+            fifo_full_d <= full;
+        end
+    end
+
+    always @(posedge HCLK or negedge HRESETn) begin
+        if (!HRESETn) begin
+            irq_reg <= 1'b0;
+        end else if (full && !fifo_full_d && fifo_was_empty) begin
+            irq_reg <= 1'b1; // Trigger IRQ when full rises and FIFO was empty before
+        end else begin
+            irq_reg <= 1'b0; // Clear IRQ after one clock cycle
+        end
+    end
+
+    assign IRQ = irq_reg;
+
+
+    
     //32 bit width 16 depth
     aucohl_fifo #(DW, AW) fifo_inst ( 
         .clk(HCLK),

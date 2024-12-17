@@ -4,6 +4,10 @@ volatile unsigned int* gpio_oe_A = (volatile unsigned int *) 0x40000004;
 volatile unsigned int* i2s_en = (volatile unsigned int*) 0x44000000;
 volatile unsigned int* i2s_done = (volatile unsigned int*) 0x44000004;
 volatile unsigned int* i2s_data = (volatile unsigned int*) 0x44000008;
+volatile unsigned int* i2s_fifo_status = (volatile unsigned int*) 0x4400000C;
+volatile unsigned int* i2s_fifo_data = (volatile unsigned int*) 0x44000010;
+
+
 
 volatile unsigned int* TIMER_STATUS = (volatile unsigned int *) 0x43000000;
 volatile unsigned int* LOAD_VALUE = (volatile unsigned int *) 0x43000004;
@@ -13,7 +17,11 @@ volatile unsigned int* uart_bauddiv = (volatile unsigned int *) 0x80000004;
 volatile unsigned int* uart_status = (volatile unsigned int *) 0x80000008;
 volatile unsigned int* uart_data = (volatile unsigned int *) 0x8000000C;
 
+volatile int flag = 0;
+void enable_IRQ(void);
 void uart_putc(char c);
+void uart_puts_hex(int num);
+
 void enable_IRQ(void){
     asm volatile("csrw mtvec, %0" :: "r"(0x00000400)); //set machine trap base to 0x00000400 makes it go to that address on interrupt, in the linker script I set the function for isr to that register, in other words on Interrupt go to the ISR function
     asm volatile("csrsi mstatus, 0x8"); //this is to enable global inerrupts
@@ -25,12 +33,8 @@ void return_m(void){
 }
 
 __attribute__((section(".isr_handler_section"))) void isr_handler(void) {
-    uart_putc('H');
-    uart_putc('E');
-    uart_putc('L');
-    uart_putc('L');
-    uart_putc('O');
 
+    flag =1;
     return_m();
 
 }
@@ -94,16 +98,12 @@ int main() {
     volatile char c1, c2;
 
     while (1) {
-        if (*i2s_done == 0x00000003){
-            x = *i2s_data;
-            *gpio_data_A = x;
-            //c1 = (x >> 24) & 0xFF;
-            //c2 = (x >> 16) & 0xFF;
-           // uart_putc('f');
-            //uart_putc('b');
-            //uart_putc('b');
-
-            uart_puts_hex(x);
+        if(flag){
+            while(*i2s_fifo_status != 0x00000001){
+                x = *i2s_fifo_data;
+                uart_puts_hex(x);
+            }
+            flag = 0;
         }
     }
     return 0;

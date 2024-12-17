@@ -173,7 +173,7 @@ module FRV_SoC (
         .SD(I2S_in),      
         .SCK(i2s_clk),
         .WS(ws),
-        .full(IRQ)
+        .IRQ(IRQ)
 
 );
 
