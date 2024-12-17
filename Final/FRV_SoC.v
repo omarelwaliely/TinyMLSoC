@@ -57,6 +57,8 @@ module FRV_SoC (
     // wire          HRESETn;
     wire [31:0] TIMER_OUT;
 
+    wire IRQ;
+
     //GPIO SLAVE WIRES
     wire [31:0] A_HRDATA, B_HRDATA, C_HRDATA, timer_HRDATA, i2s_HRDATA;
     wire        A_SEL, B_SEL, C_SEL, timer_SEL, i2s_SEL;
@@ -84,7 +86,7 @@ module FRV_SoC (
         .HWDATA(HWDATA),
         .HREADY(HREADY),
         .HRDATA(HRDATA),
-        .IRQ(1'b0)
+        .IRQ(IRQ)
     );
 
     ahbl_gpio GPIO_A (
@@ -170,7 +172,8 @@ module FRV_SoC (
         .HRDATA(i2s_HRDATA),
         .SD(I2S_in),      
         .SCK(i2s_clk),
-        .WS(ws)
+        .WS(ws),
+        .full(IRQ)
 
 );
 

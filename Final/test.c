@@ -13,6 +13,28 @@ volatile unsigned int* uart_bauddiv = (volatile unsigned int *) 0x80000004;
 volatile unsigned int* uart_status = (volatile unsigned int *) 0x80000008;
 volatile unsigned int* uart_data = (volatile unsigned int *) 0x8000000C;
 
+void uart_putc(char c);
+void enable_IRQ(void){
+    asm volatile("csrw mtvec, %0" :: "r"(0x00000400)); //set machine trap base to 0x00000400 makes it go to that address on interrupt, in the linker script I set the function for isr to that register, in other words on Interrupt go to the ISR function
+    asm volatile("csrsi mstatus, 0x8"); //this is to enable global inerrupts
+    asm volatile("csrsi mie, 0x8");      //I dont know if this line is needed but it enables "external" interrupts
+
+}
+void return_m(void){
+    asm volatile("mret");
+}
+
+__attribute__((section(".isr_handler_section"))) void isr_handler(void) {
+    uart_putc('H');
+    uart_putc('E');
+    uart_putc('L');
+    uart_putc('L');
+    uart_putc('O');
+
+    return_m();
+
+}
+
 void delay(unsigned int milliseconds) {
     *LOAD_VALUE = milliseconds * 6000; // 6000 for 6MHz clock
     *TIMER_STATUS = 0x0000001;
@@ -63,6 +85,7 @@ unsigned int reverse_bits(unsigned int num) {
 }
 
 int main() {
+    enable_IRQ();
     volatile int add = 0x00000009;
    *i2s_en = add;
     uart_init(3);         // Initialize UART with a baud rate setting

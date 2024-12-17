@@ -1,5 +1,5 @@
 CROSS=riscv64-unknown-elf-
-CFLAGS=-march=rv32ic -mabi=ilp32 -ffreestanding -nostdlib -O2 -Wall 
+CFLAGS=-march=rv32ic_zicsr -mabi=ilp32 -ffreestanding -nostdlib -O3 -Wall 
 LFLAGS=-Wl,--build-id=none,-Bstatic,-T,link.ld,--strip-debug
 VFILES=FRV_SoC.f
 TBFILES=FRV_SoC_tb.v

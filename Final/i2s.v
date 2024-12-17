@@ -12,7 +12,7 @@ module i2s(
 reg BCLK_d, WS_d;
 localparam size = 32;
 reg [size -1 : 0] shift_reg;
-reg [6:0] WS_cntr; 
+reg [6:0] WS_cntr;
 reg [1:0] BCLK_cntr;
 reg [1:0] done_cntr;
 

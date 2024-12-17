@@ -16,6 +16,11 @@ SECTIONS
         _sidata = .;
     } >PRAM
 
+     .isr_handler_section : AT(0x00000400) /* Place at address 0x400 within PRAM */
+    {
+        *(.isr_handler)
+    } > PRAM
+    
     /*  
         This is the initialized data section
         The program executes knowing that the data is in the RAM
@@ -34,6 +39,7 @@ SECTIONS
         _edata = .;        /* define a global symbol at data end; used by startup code in order to initialise the .data section in RAM */
     } > DRAM
 
+   
     /* Uninitialized data section */
     .bss :
     {

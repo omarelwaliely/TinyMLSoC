@@ -40,6 +40,9 @@ module ahbl_i2s (
     localparam DW = 32;  
     localparam AW = 4;
 
+    reg rdy_sync1, rdy_sync2;
+
+
     reg rd,flush;
     wire wr = rdy;
     wire empty;
@@ -94,24 +97,33 @@ module ahbl_i2s (
                     32'hBADDBEEF;
 
 
-
+   always @(posedge HCLK or negedge HRESETn) begin
+        if (!HRESETn) begin
+            rdy_sync1 <= 1'b0;
+            rdy_sync2 <= 1'b0;
+        end else begin
+            rdy_sync1 <= rdy;       // First stage
+            rdy_sync2 <= rdy_sync1; // Second stage
+        end
+    end
+    
     always @(posedge HCLK or negedge HRESETn) begin
         if (!HRESETn)
             DONE_REG <= 2'b00;
-        else if (rdy)
-            DONE_REG <= {rdy, WS};
+        else if (rdy_sync2)  // Prioritize `rdy`
+            DONE_REG <= {rdy_sync2, WS};
         else if (ahbl_re && DONE_REG_SEL)  // Clear `DONE_REG` on AHB read
             DONE_REG <= {1'b0, WS};
     end
 
     always@(posedge HCLK, negedge HRESETn) begin
-        if(!HRESETn)
-            DATA_REG<=32'd0;
-        else
-            if (ahbl_re && DATA_REG_SEL)
-                DATA_REG<=DATA_REG;
-            else if(rdy)
-                DATA_REG <= sample;
+            if(!HRESETn)
+                DATA_REG<=32'd0;
+            else
+                if (ahbl_re && DATA_REG_SEL)
+                    DATA_REG<=DATA_REG;
+                else if(rdy)
+                    DATA_REG <= sample;
     end
 
 
@@ -142,6 +154,15 @@ module ahbl_i2s (
             flush    <= 'h00;
             wdata    <= 'h0;
         end
+        //REMOVE THE BELOW LATER THIS IS JUST SO I CAN TEST THE ISR. IT INSTA EMPTIES THE FIFO WE DONT WANT THAT
+        else begin
+            if(full) begin 
+                flush <= 1;
+            end
+            else if (flush) begin
+                flush <=0;
+            end
+        end
     end
 
     always@(posedge HCLK, negedge HRESETn) begin
@@ -149,7 +170,6 @@ module ahbl_i2s (
             wdata = DATA_REG;
         end
     end
-
     
 
     //32 bit width 16 depth
