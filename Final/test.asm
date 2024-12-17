@@ -38,7 +38,7 @@ Disassembly of section .text:
   40:	4f01                	li	t5,0
   42:	4f81                	li	t6,0
   44:	00000517          	auipc	a0,0x0
-  48:	2bc50513          	addi	a0,a0,700 # 300 <_sidata>
+  48:	27850513          	addi	a0,a0,632 # 2bc <_sidata>
   4c:	20000597          	auipc	a1,0x20000
   50:	fb458593          	addi	a1,a1,-76 # 20000000 <uart_data>
   54:	20000617          	auipc	a2,0x20000
@@ -208,7 +208,7 @@ Disassembly of section .text:
  222:	00472703          	lw	a4,4(a4) # 20000004 <uart_status>
  226:	00052503          	lw	a0,0(a0) # 20000000 <uart_data>
  22a:	00c5a583          	lw	a1,12(a1) # 2000000c <uart_ctrl>
- 22e:	a0d78793          	addi	a5,a5,-1523 # a0d <_sidata+0x70d>
+ 22e:	a0d78793          	addi	a5,a5,-1523 # a0d <_sidata+0x751>
  232:	00c105a3          	sb	a2,11(sp)
  236:	00010723          	sb	zero,14(sp)
  23a:	00f11623          	sh	a5,12(sp)
@@ -241,48 +241,26 @@ Disassembly of section .text:
  27e:	8082                	ret
 
 00000280 <main>:
- 280:	7179                	addi	sp,sp,-48
- 282:	d606                	sw	ra,44(sp)
- 284:	d422                	sw	s0,40(sp)
- 286:	d226                	sw	s1,36(sp)
- 288:	d04a                	sw	s2,32(sp)
- 28a:	ce4e                	sw	s3,28(sp)
- 28c:	40000793          	li	a5,1024
- 290:	30579073          	csrw	mtvec,a5
- 294:	30046073          	csrsi	mstatus,8
- 298:	30446073          	csrsi	mie,8
- 29c:	47a5                	li	a5,9
- 29e:	c43e                	sw	a5,8(sp)
+ 280:	1141                	addi	sp,sp,-16
+ 282:	40000793          	li	a5,1024
+ 286:	30579073          	csrw	mtvec,a5
+ 28a:	30046073          	csrsi	mstatus,8
+ 28e:	30446073          	csrsi	mie,8
+ 292:	47a5                	li	a5,9
+ 294:	c63e                	sw	a5,12(sp)
+ 296:	200007b7          	lui	a5,0x20000
+ 29a:	0287a683          	lw	a3,40(a5) # 20000028 <i2s_en>
+ 29e:	4632                	lw	a2,12(sp)
  2a0:	200007b7          	lui	a5,0x20000
- 2a4:	0287a683          	lw	a3,40(a5) # 20000028 <i2s_en>
- 2a8:	4522                	lw	a0,8(sp)
- 2aa:	200007b7          	lui	a5,0x20000
- 2ae:	0087a703          	lw	a4,8(a5) # 20000008 <uart_bauddiv>
- 2b2:	200007b7          	lui	a5,0x20000
- 2b6:	00c7a783          	lw	a5,12(a5) # 2000000c <uart_ctrl>
- 2ba:	200005b7          	lui	a1,0x20000
- 2be:	c288                	sw	a0,0(a3)
- 2c0:	20000637          	lui	a2,0x20000
- 2c4:	468d                	li	a3,3
- 2c6:	01c5a903          	lw	s2,28(a1) # 2000001c <i2s_fifo_status>
- 2ca:	01862983          	lw	s3,24(a2) # 20000018 <i2s_fifo_data>
- 2ce:	4485                	li	s1,1
- 2d0:	c314                	sw	a3,0(a4)
- 2d2:	c384                	sw	s1,0(a5)
- 2d4:	20000437          	lui	s0,0x20000
- 2d8:	03442783          	lw	a5,52(s0) # 20000034 <flag>
- 2dc:	dff5                	beqz	a5,2d8 <main+0x58>
- 2de:	00092783          	lw	a5,0(s2)
- 2e2:	00978b63          	beq	a5,s1,2f8 <main+0x78>
- 2e6:	0009a783          	lw	a5,0(s3)
- 2ea:	c63e                	sw	a5,12(sp)
- 2ec:	4532                	lw	a0,12(sp)
- 2ee:	3585                	jal	14e <uart_puts_hex>
- 2f0:	00092783          	lw	a5,0(s2)
- 2f4:	fe9799e3          	bne	a5,s1,2e6 <main+0x66>
- 2f8:	02042a23          	sw	zero,52(s0)
- 2fc:	bff1                	j	2d8 <main+0x58>
-	...
+ 2a4:	0087a703          	lw	a4,8(a5) # 20000008 <uart_bauddiv>
+ 2a8:	200007b7          	lui	a5,0x20000
+ 2ac:	00c7a783          	lw	a5,12(a5) # 2000000c <uart_ctrl>
+ 2b0:	c290                	sw	a2,0(a3)
+ 2b2:	468d                	li	a3,3
+ 2b4:	c314                	sw	a3,0(a4)
+ 2b6:	4705                	li	a4,1
+ 2b8:	c398                	sw	a4,0(a5)
+ 2ba:	a001                	j	2ba <main+0x3a>
 
 Disassembly of section .data:
 
@@ -341,7 +319,7 @@ Disassembly of section .data:
 Disassembly of section .riscv.attributes:
 
 00000000 <.riscv.attributes>:
-   0:	2d41                	jal	690 <isr_handler+0x390>
+   0:	2d41                	jal	690 <isr_handler+0x3d4>
    2:	0000                	unimp
    4:	7200                	.insn	2, 0x7200
    6:	7369                	lui	t1,0xffffa
@@ -373,9 +351,50 @@ Disassembly of section .comment:
 
 Disassembly of section .isr_handler_section:
 
-00000300 <isr_handler>:
- 300:	200007b7          	lui	a5,0x20000
- 304:	4705                	li	a4,1
- 306:	02e7aa23          	sw	a4,52(a5) # 20000034 <flag>
- 30a:	30200073          	mret
- 30e:	8082                	ret
+000002bc <isr_handler>:
+ 2bc:	200007b7          	lui	a5,0x20000
+ 2c0:	0047a783          	lw	a5,4(a5) # 20000004 <uart_status>
+ 2c4:	20000737          	lui	a4,0x20000
+ 2c8:	4685                	li	a3,1
+ 2ca:	02d72a23          	sw	a3,52(a4) # 20000034 <flag>
+ 2ce:	4398                	lw	a4,0(a5)
+ 2d0:	df7d                	beqz	a4,2ce <isr_handler+0x12>
+ 2d2:	20000737          	lui	a4,0x20000
+ 2d6:	00072603          	lw	a2,0(a4) # 20000000 <uart_data>
+ 2da:	20000737          	lui	a4,0x20000
+ 2de:	00c72683          	lw	a3,12(a4) # 2000000c <uart_ctrl>
+ 2e2:	04800713          	li	a4,72
+ 2e6:	c218                	sw	a4,0(a2)
+ 2e8:	4298                	lw	a4,0(a3)
+ 2ea:	00276713          	ori	a4,a4,2
+ 2ee:	c298                	sw	a4,0(a3)
+ 2f0:	4398                	lw	a4,0(a5)
+ 2f2:	df7d                	beqz	a4,2f0 <isr_handler+0x34>
+ 2f4:	04500713          	li	a4,69
+ 2f8:	c218                	sw	a4,0(a2)
+ 2fa:	4298                	lw	a4,0(a3)
+ 2fc:	00276713          	ori	a4,a4,2
+ 300:	c298                	sw	a4,0(a3)
+ 302:	4398                	lw	a4,0(a5)
+ 304:	df7d                	beqz	a4,302 <isr_handler+0x46>
+ 306:	04c00713          	li	a4,76
+ 30a:	c218                	sw	a4,0(a2)
+ 30c:	4298                	lw	a4,0(a3)
+ 30e:	00276713          	ori	a4,a4,2
+ 312:	c298                	sw	a4,0(a3)
+ 314:	4398                	lw	a4,0(a5)
+ 316:	df7d                	beqz	a4,314 <isr_handler+0x58>
+ 318:	04c00713          	li	a4,76
+ 31c:	c218                	sw	a4,0(a2)
+ 31e:	4298                	lw	a4,0(a3)
+ 320:	00276713          	ori	a4,a4,2
+ 324:	c298                	sw	a4,0(a3)
+ 326:	4398                	lw	a4,0(a5)
+ 328:	df7d                	beqz	a4,326 <isr_handler+0x6a>
+ 32a:	04f00793          	li	a5,79
+ 32e:	c21c                	sw	a5,0(a2)
+ 330:	429c                	lw	a5,0(a3)
+ 332:	0027e793          	ori	a5,a5,2
+ 336:	c29c                	sw	a5,0(a3)
+ 338:	30200073          	mret
+ 33c:	8082                	ret

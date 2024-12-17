@@ -33,8 +33,7 @@ void return_m(void){
 }
 
 __attribute__((section(".isr_handler_section"))) void isr_handler(void) {
-
-    flag =1;
+    flag = 1;    
     return_m();
 
 }
