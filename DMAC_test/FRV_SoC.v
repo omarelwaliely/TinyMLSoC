@@ -104,7 +104,7 @@ module FRV_SoC (
 
     //setting everything in DMAC to 0 until I make sure it works
     wire[31:0] HADDR_DMAC = 32'd0;
-    wire HWRITE_DMAC = 1'd0;
+    wire HWRITE_DMAC = 1'd1;
     wire [1:0] HTRANS_DMAC = 2'd0;
     wire [2:0] HSIZE_DMAC = 3'd0;
     wire [2:0] HBURST_DMAC = 3'd0;
@@ -251,7 +251,7 @@ module FRV_SoC (
         .HSIZE(HSIZE_CPU),
         .HWRITE(HWRITE_CPU),
         .HWDATA(HWDATA_CPU),
-        .HREADY(1'b1), //always ready
+        .HREADY(CPU_HREADY),
         .HRDATA(CPU_HRDATA),
         .IRQ(IRQ)
     );
