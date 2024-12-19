@@ -119,7 +119,7 @@ module FRV_SoC (
     //--concatenated vectors
 
     //master
-    wire [N_MASTERS-1:0] src_hready_resp; //i dont think we use this in our design
+    wire [N_MASTERS-1:0] src_hready_resp; 
     wire [N_MASTERS-1:0] src_hresp; //we definitly dont use this in our design but ill keep it here jic
     wire [N_MASTERS*W_ADDR-1:0] src_haddr = {HADDR_DMAC, HADDR_CPU};
     wire [N_MASTERS-1:0] src_hwrite = {HWRITE_DMAC,HWRITE_CPU};
