@@ -58,6 +58,7 @@ module FRV_SoC (
     wire [31:0] TIMER_OUT;
 
     wire IRQ;
+    wire PIRQ_I2S;
 
     //GPIO SLAVE WIRES
     wire [31:0] A_HRDATA, B_HRDATA, C_HRDATA, timer_HRDATA, i2s_HRDATA;
@@ -65,17 +66,17 @@ module FRV_SoC (
     wire        A_HREADYOUT, B_HREADYOUT, C_HREADYOUT, timer_HREADYOUT, i2s_HREADYOUT;
     
 
-//------------------------
+    //------------------------
 
 
     //SPLITTER SLAVE WIRES
-    wire [31:0] S0_HRDATA, S1_HRDATA, S2_HRDATA, S3_HRDATA, S4_HRDATA, S5_HRDATA;
+    wire [31:0] S0_HRDATA, S1_HRDATA, S2_HRDATA, S3_HRDATA, S4_HRDATA, sHRDATA_DMAC;
     wire        S0_HSEL, S1_HSEL, S2_HSEL, S3_HSEL, S4_HSEL, S5_HSEL;
-    wire        S0_HREADYOUT, S1_HREADYOUT, S2_HREADYOUT, S3_HREADYOUT, S4_HREADYOUT, S5_HREADYOUT;
+    wire        S0_HREADYOUT, S1_HREADYOUT, S2_HREADYOUT, S3_HREADYOUT, S4_HREADYOUT, sHREADYOUT_DMAC;
 
 
 
- //-----------Crossbar time
+    //-----------Crossbar time
  
     localparam  N_MASTERS= 2;
     localparam N_SLAVES = 5;
@@ -103,15 +104,14 @@ module FRV_SoC (
 
 
     //trying dummy values to see if stopping cpu and taking control is possible
-    wire[31:0] HADDR_DMAC = 32'h20001000;
-    wire HWRITE_DMAC = 1'b1;
-    wire [1:0] HTRANS_DMAC = 2'b00; //to try transmitting i made this 10
-    wire [2:0] HSIZE_DMAC = 3'd0;
-    wire [2:0] HBURST_DMAC = 3'd0;
-    wire HMASTLOCK_DMAC = 1'b1;
-    wire [31:0] HWDATA_DMAC = 32'd100;
-    wire [3:0] HPROT_DMAC = 4'd0; //we dont support prot
-    wire stop = 1'b0; //set this to 1 to take control
+    wire[31:0] mHADDR_DMAC;
+    wire mHWRITE_DMAC;
+    wire [1:0] mHTRANS_DMAC; //to try transmitting i made this 10
+    wire [2:0] mHSIZE_DMAC;
+    wire [2:0] mHBURST_DMAC;
+    wire mHMASTLOCK_DMAC;
+    wire [31:0] mHWDATA_DMAC;
+    wire [3:0] mHPROT_DMAC = 4'd0; //we dont support prot
 
 
 
@@ -122,28 +122,28 @@ module FRV_SoC (
     //master
     wire [N_MASTERS-1:0] src_hready_resp; 
     wire [N_MASTERS-1:0] src_hresp; //we definitly dont use this in our design but ill keep it here jic
-    wire [N_MASTERS*W_ADDR-1:0] src_haddr = {HADDR_DMAC, HADDR_CPU};
-    wire [N_MASTERS-1:0] src_hwrite = {HWRITE_DMAC,HWRITE_CPU};
-    wire [N_MASTERS*2-1:0] src_htrans = {HTRANS_DMAC,HTRANS_CPU};
-    wire [N_MASTERS*3-1:0] src_hsize = {HSIZE_DMAC,HSIZE_CPU};
-    wire [N_MASTERS*3-1:0] src_hburst = {HBURST_DMAC,HBURST_CPU};
-	wire [N_MASTERS*4-1:0]      src_hprot = {HPROT_DMAC,HPROT_CPU};
-    wire [N_MASTERS-1:0] src_hmastlock = {HMASTLOCK_DMAC,HMASTLOCK_CPU};
-    wire [N_MASTERS*W_DATA-1:0] src_hwdata = {HWDATA_DMAC,HWDATA_CPU};
+    wire [N_MASTERS*W_ADDR-1:0] src_haddr = {mHADDR_DMAC, HADDR_CPU};
+    wire [N_MASTERS-1:0] src_hwrite = {mHWRITE_DMAC,HWRITE_CPU};
+    wire [N_MASTERS*2-1:0] src_htrans = {mHTRANS_DMAC,HTRANS_CPU};
+    wire [N_MASTERS*3-1:0] src_hsize = {mHSIZE_DMAC,HSIZE_CPU};
+    wire [N_MASTERS*3-1:0] src_hburst = {mHBURST_DMAC,HBURST_CPU};
+	wire [N_MASTERS*4-1:0]      src_hprot = {mHPROT_DMAC,HPROT_CPU};
+    wire [N_MASTERS-1:0] src_hmastlock = {mHMASTLOCK_DMAC,HMASTLOCK_CPU};
+    wire [N_MASTERS*W_DATA-1:0] src_hwdata = {mHWDATA_DMAC,HWDATA_CPU};
     wire [N_MASTERS*W_DATA-1:0] src_hrdata;
 
     //assigning output master wires
 
     wire [W_DATA-1:0] CPU_HRDATA = src_hrdata[W_DATA*0+:W_DATA];
-    wire [W_DATA-1:0] DMAC_HRDATA = src_hrdata[W_DATA*1:W_DATA];
+    wire [W_DATA-1:0] mDMAC_HRDATA = src_hrdata[W_DATA*1:W_DATA];
 
     wire CPU_HREADY = src_hready_resp[0];
-    wire DMAC_HREADY = src_hready_resp[1];
+    wire mDMAC_HREADY = src_hready_resp[1];
 
 
     //slaves
     wire [N_SLAVES-1:0] dst_hready;
-    wire [N_SLAVES-1:0]         dst_hready_resp ={S0_HREADYOUT,S1_HREADYOUT,S2_HREADYOUT,S3_HREADYOUT,S4_HREADYOUT};
+    wire [N_SLAVES-1:0]         dst_hready_resp ={S0_HREADYOUT,S1_HREADYOUT,S2_HREADYOUT,S3_HREADYOUT,sHREADYOUT_DMAC};
     wire [N_SLAVES-1:0]         dst_hresp = 5'd1; // we dont use this wire in our design so ill set it to 1's indicating no failure
     wire [N_SLAVES*W_ADDR-1:0]  dst_haddr;
     wire [N_SLAVES-1:0]         dst_hwrite;
@@ -153,7 +153,7 @@ module FRV_SoC (
     wire [N_SLAVES*4-1:0]       dst_hprot;
     wire [N_SLAVES-1:0]         dst_hmastlock; //we dont have any advanced slaves so this isnt really needed (ex: MPMC)
     wire [N_SLAVES*W_DATA-1:0]  dst_hwdata;
-    wire [N_SLAVES*W_DATA-1:0]  dst_hrdata = {S0_HRDATA, S1_HRDATA, S2_HRDATA, S3_HRDATA,S4_HRDATA}; //they all take the same HRDATA (HRDATA) in our design
+    wire [N_SLAVES*W_DATA-1:0]  dst_hrdata = {S0_HRDATA, S1_HRDATA, S2_HRDATA, S3_HRDATA,sHRDATA_DMAC}; //they all take the same HRDATA (HRDATA) in our design
 
 
     //all slaves can receive the these same values without causing conflicts so ill recycle for now
@@ -168,37 +168,37 @@ module FRV_SoC (
     wire RAM_hready = dst_hready[3];
     wire GPIO_SPLITTER_hready = dst_hready[2]; 
     wire UART_hready = dst_hready[1];
-    wire APB_hready = dst_hready[0];
+    wire sHREADY_DMAC = dst_hready[0];
 
     wire[W_ADDR-1:0] ROM_haddr = dst_haddr[4*W_ADDR+:W_ADDR];
     wire[W_ADDR-1:0] RAM_haddr = dst_haddr[3*W_ADDR+:W_ADDR];
     wire[W_ADDR-1:0] GPIO_SPLITTER_haddr = dst_haddr[2*W_ADDR+:W_ADDR];
     wire[W_ADDR-1:0] UART_haddr = dst_haddr[1*W_ADDR+:W_ADDR];
-    wire[W_ADDR-1:0] APB_haddr = dst_haddr[0*W_ADDR+:W_ADDR];
+    wire[W_ADDR-1:0] sHADDR_DMAC = dst_haddr[0*W_ADDR+:W_ADDR];
 
     wire ROM_hwrite = dst_hwrite[4];
     wire RAM_hwrite = dst_hwrite[3];
     wire GPIO_SPLITTER_hwrite = dst_hwrite[2];
     wire UART_hwrite = dst_hwrite[1];
-    wire APB_hwrite = dst_hwrite[0];
+    wire sHWRITE_DMAC = dst_hwrite[0];
 
     wire[2:0] ROM_hsize = dst_hsize[4*3+:3];
     wire[2:0] RAM_hsize = dst_hsize[3*3+:3];
     wire[2:0] GPIO_SPLITTER_hsize = dst_hsize[2*3+:3];
     wire[2:0] UART_hsize = dst_hsize[1*3+:3];
-    wire[2:0] APB_hsize = dst_hsize[0*3+:3];
+    wire[2:0] sHSIZE_DMAC = dst_hsize[0*3+:3];
 
     wire[W_DATA-1:0] ROM_hwdata = dst_hwdata[4*W_DATA+:W_DATA];
     wire[W_DATA-1:0] RAM_hwdata = dst_hwdata[3*W_DATA+:W_DATA];
     wire[W_DATA-1:0] GPIO_SPLITTER_hwdata = dst_hwdata[2*W_DATA+:W_DATA];
     wire[W_DATA-1:0] UART_hwdata = dst_hwdata[1*W_DATA+:W_DATA];
-    wire[W_DATA-1:0] APB_hwdata = dst_hwdata[0*W_DATA+:W_DATA]; 
+    wire[W_DATA-1:0] sHWDATA_DMAC = dst_hwdata[0*W_DATA+:W_DATA]; 
 
     wire [1:0] ROM_htrans = dst_htrans[8+:2];
     wire [1:0] RAM_htrans = dst_htrans[6+:2];
     wire [1:0] GPIO_SPLITTER_htrans = dst_htrans[4+:2];
     wire [1:0] UART_htrans = dst_htrans[2+:2];
-    wire [1:0] APB_htrans = dst_htrans[0+:2];
+    wire [1:0] sHTRANS_DMAC = dst_htrans[0+:2];
 
 
 
@@ -252,11 +252,39 @@ module FRV_SoC (
         .HSIZE(HSIZE_CPU),
         .HWRITE(HWRITE_CPU),
         .HWDATA(HWDATA_CPU),
-        .HREADY(CPU_HREADY),
+        .HREADY(1'b1),
         .HRDATA(CPU_HRDATA),
         .IRQ(IRQ),
 
         .stop(stop)
+    );
+
+
+    //---- DMAC
+    ahbl_dmac DMAC(
+    .HCLK(HCLK),
+    .HRESETn(HRESETn),
+
+    .mHADDR(mHADDR_DMAC),
+    .mHTRANS(mHTRANS_DMAC),
+    .mHSIZE(mHSIZE_DMAC),
+    .mHWRITE(mHWRITE_DMAC),
+    .mHWDATA(mHWDATA_DMAC),
+    .mHREADY(mDMAC_HREADY),
+    .mHRDATA(mDMAC_HRDATA),
+    .PIRQ({7'b0000000,PIRQ_I2S}),
+
+    .sHADDR(sHADDR_DMAC),
+    .sHTRANS(sHTRANS_DMAC),
+    .sHSIZE(sHSIZE_DMAC),
+    .sHWRITE(sHWRITE_DMAC),
+    .sHWDATA(sHWDATA_DMAC),
+    .sHREADY(sHREADY_DMAC),
+    .sHREADYOUT(sHREADYOUT_DMAC),
+    .sHRDATA(sHRDATA_DMAC),
+    .busy(stop),
+
+    .IRQ(IRQ)
     );
 
     ahbl_gpio GPIO_A (
@@ -340,7 +368,7 @@ module FRV_SoC (
         .SD(I2S_in),      
         .SCK(i2s_clk),
         .WS(ws),
-        .IRQ(IRQ)
+        .IRQ(PIRQ_I2S)
 
 );
 
@@ -363,71 +391,40 @@ module FRV_SoC (
     );
 
     // AHB-to-APB Bridge Instantiation
-    apb2ahbl APB_BRIDGE (
-        .HCLK(HCLK),
-        .HRESETn(HRESETn),
-        .HADDR(APB_haddr),
-        .HTRANS(APB_htrans),
-        .HWRITE(APB_hwrite),
-        .HREADY(APB_hready),
-        .HWDATA(APB_hwdata),
-        .HSIZE(APB_hsize),
-        .HREADYOUT(S4_HREADYOUT),
-        .HRDATA(S4_HRDATA),
-        .PCLK(PCLK),
-        .PRESETn(PRESETn),
-        .PRDATA(PRDATA),
-        .PREADY(PREADY),
-        .PWDATA(PWDATA),
-        .PADDR(PADDR),
-        .PENABLE(PENABLE),
-        .PWRITE(PWRITE)
-    );
-
-        // APB Module Instance
-    apb APB_MODULE (
-        .PCLK(PCLK),
-        .PRESETn(PRESETn),
-        .PWRITE(PWRITE),
-        .PWDATA(PWDATA),
-        .PADDR(PADDR),
-        .PENABLE(PENABLE),
-        .PREADY(PREADY),
-        .PRDATA(PRDATA),
-        .GPIO_IN(GPIO_IN_D),
-        .GPIO_OUT(GPIO_OUT_D),
-        .GPIO_OE(GPIO_OE_D)
-    );
-
-
-    // ahbl_splitter #(
-    //     .S0(4'h0),     // Program Memory
-    //     .S1(4'h2),     // Data Memory
-    //     .S2(4'h4),     // GPIO Port
-    //     .S3(4'h8),     // UART Transmitter
-    //     .S4(4'h6)      // APB Bridge
-    // ) SPLITTER (
+    // apb2ahbl APB_BRIDGE (
     //     .HCLK(HCLK),
     //     .HRESETn(HRESETn),
-    //     .HADDR(HADDR),
-    //     .HTRANS(HTRANS),
-    //     .HREADY(HREADY),
-    //     .HRDATA(HRDATA),
-    //     .S0_HSEL(S0_HSEL),
-    //     .S0_HRDATA(S0_HRDATA),
-    //     .S0_HREADYOUT(S0_HREADYOUT),
-    //     .S1_HSEL(S1_HSEL),
-    //     .S1_HRDATA(S1_HRDATA),
-    //     .S1_HREADYOUT(S1_HREADYOUT),
-    //     .S2_HSEL(S2_HSEL),
-    //     .S2_HRDATA(S2_HRDATA),
-    //     .S2_HREADYOUT(S2_HREADYOUT),
-    //     .S3_HSEL(S3_HSEL),
-    //     .S3_HRDATA(S3_HRDATA),
-    //     .S3_HREADYOUT(S3_HREADYOUT),
-    //     .S4_HSEL(S4_HSEL),
-    //     .S4_HRDATA(S4_HRDATA),
-    //     .S4_HREADYOUT(S4_HREADYOUT)
+    //     .HADDR(APB_haddr),
+    //     .HTRANS(APB_htrans),
+    //     .HWRITE(APB_hwrite),
+    //     .HREADY(APB_hready),
+    //     .HWDATA(APB_hwdata),
+    //     .HSIZE(APB_hsize),
+    //     .HREADYOUT(S4_HREADYOUT),
+    //     .HRDATA(S4_HRDATA),
+    //     .PCLK(PCLK),
+    //     .PRESETn(PRESETn),
+    //     .PRDATA(PRDATA),
+    //     .PREADY(PREADY),
+    //     .PWDATA(PWDATA),
+    //     .PADDR(PADDR),
+    //     .PENABLE(PENABLE),
+    //     .PWRITE(PWRITE)
+    // );
+
+        // APB Module Instance
+    // apb APB_MODULE (
+    //     .PCLK(PCLK),
+    //     .PRESETn(PRESETn),
+    //     .PWRITE(PWRITE),
+    //     .PWDATA(PWDATA),
+    //     .PADDR(PADDR),
+    //     .PENABLE(PENABLE),
+    //     .PREADY(PREADY),
+    //     .PRDATA(PRDATA),
+    //     .GPIO_IN(GPIO_IN_D),
+    //     .GPIO_OUT(GPIO_OUT_D),
+    //     .GPIO_OE(GPIO_OE_D)
     // );
 
     ahbl_gpio_splitter #(.A(4'h0), 

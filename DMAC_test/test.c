@@ -1,3 +1,5 @@
+#include <stdint.h>
+#include <stddef.h>
 volatile unsigned int* gpio_data_A = (volatile unsigned int *) 0x40000000;
 volatile unsigned int* gpio_oe_A = (volatile unsigned int *) 0x40000004;
 
@@ -17,22 +19,46 @@ volatile unsigned int* uart_bauddiv = (volatile unsigned int *) 0x80000004;
 volatile unsigned int* uart_status = (volatile unsigned int *) 0x80000008;
 volatile unsigned int* uart_data = (volatile unsigned int *) 0x8000000C;
 
+
+volatile unsigned int* dmac_saddr   = (volatile unsigned int*) 0x60000000;
+volatile unsigned int* dmac_daddr   = (volatile unsigned int*) 0x60000004;
+volatile unsigned int* dmac_ctrl    = (volatile unsigned int*) 0x60000008;
+volatile unsigned int* dmac_scfg    = (volatile unsigned int*) 0x6000000C;
+volatile unsigned int* dmac_dcfg    = (volatile unsigned int*) 0x60000010;
+volatile unsigned int* dmac_cfg     = (volatile unsigned int*) 0x60000014;
+volatile unsigned int* dmac_bcount  = (volatile unsigned int*) 0x60000018;
+volatile unsigned int* dmac_bsize   = (volatile unsigned int*) 0x6000001C;
+volatile unsigned int* dmac_status  = (volatile unsigned int*) 0x60000020;
+
+
+typedef struct {
+    unsigned int saddr;    
+    unsigned int daddr;    
+    unsigned char bcount;
+    unsigned char bsize;
+    unsigned char sinc;
+    unsigned char dinc;
+    unsigned char ssize;
+    unsigned char dsize;
+    unsigned char wfi;
+    unsigned char irqsrc;
+} dmac_descriptor;
+
+
 volatile int flag = 0;
-void enable_IRQ(void);
 void uart_putc(char c);
 void uart_puts_hex(int num);
 
-void enable_IRQ(void){
-    asm volatile("csrw mtvec, %0" :: "r"(0x00000400)); //set machine trap base to 0x00000400 makes it go to that address on interrupt, in the linker script I set the function for isr to that register, in other words on Interrupt go to the ISR function
-    asm volatile("csrsi mstatus, 0x8"); //this is to enable global inerrupts
-    asm volatile("csrsi mie, 0x8");      //I dont know if this line is needed but it enables "external" interrupts
-
+void enable_IRQ(void (*isr)(void)) {
+    asm volatile("csrw mtvec, %0" :: "r"(isr));
+    asm volatile("csrsi mstatus, 0x8");
+    asm volatile("csrsi mie, 0x8");
 }
 void return_m(void){
     asm volatile("mret");
 }
 
-__attribute__((section(".isr_handler_section"))) void isr_handler(void) {
+void isr_handler(void) {
     flag = 1;    
     return_m();
 
@@ -79,16 +105,45 @@ void uart_puts_hex(int num) {
     uart_puts(hex_string); // Send the hex string with UART
 }
 
-unsigned int reverse_bits(unsigned int num) {
-    unsigned int reversed = 0;
-    for (int i = 0; i < 32; i++) {
-        reversed |= ((num >> i) & 0x1) << (31 - i);
-    }
-    return reversed;
+void dmac_init(dmac_descriptor *d){
+    *dmac_saddr = d->saddr;
+    *dmac_daddr = d->daddr;
+    *dmac_scfg  = d->ssize  + d->sinc*16;
+    *dmac_dcfg  = d->dsize  + d->dinc*16;
+    *dmac_cfg   = d->wfi    + d->irqsrc*16;
+    *dmac_bcount= d->bcount;
+    *dmac_bsize = d->bsize;
 }
 
+void *memset(void *s, int c, size_t n) {
+    unsigned char *ptr = s;
+    while (n--) {
+        *ptr++ = (unsigned char)c;
+    }
+    return s;
+}
+   // dmac_descriptor dd;
+
 int main() {
-    enable_IRQ();
+    dmac_descriptor dd;
+    uint32_t mic_out[16] = {0};
+    dd.saddr = 0x44100000;
+    dd.daddr =  (unsigned int) mic_out;
+    dd.bcount = 16;
+    dd.bsize = 8;
+    dd.wfi = 0;
+    dd.irqsrc = 0;
+    dd.sinc=1;
+    dd.dinc=1;
+    dd.ssize=0;
+    dd.dsize=0;
+
+    dmac_init(&dd);
+    //dmac_start();
+
+    enable_IRQ(isr_handler);
+
+
     volatile int add = 0x00000009;
    *i2s_en = add;
     uart_init(3);         // Initialize UART with a baud rate setting
@@ -97,16 +152,14 @@ int main() {
     volatile char c1, c2;
                   *gpio_data_A = 3;
 
+    volatile int count =0;
     while (1) {
-        //while (*i2s_done != 0x00000003);
-          //x = *i2s_data;
-              //*gpio_data_A = x;
-
+        //count +=1;
         if(flag){
-            while(*i2s_fifo_status != 0x00000001){
-                x = *i2s_fifo_data;
-                uart_puts_hex(x);
-            }
+            // while(*i2s_fifo_status != 0x00000001){
+            //     x = *i2s_fifo_data;
+            //     uart_puts_hex(x);
+            // }
             flag = 0;
         }
     }

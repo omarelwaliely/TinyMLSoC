@@ -26,4 +26,5 @@ ahbl_crossbar.v
 ahbl_arbiter.v
 onehot_mux.v
 onehot_priority.v
-
+ahbl_dmac.v
+dmac_master.v

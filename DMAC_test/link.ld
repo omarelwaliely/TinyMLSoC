@@ -16,10 +16,6 @@ SECTIONS
         _sidata = .;
     } >PRAM
 
-     .isr_handler_section : AT(0x00000400) /* Place at address 0x400 within PRAM */
-    {
-        *(.isr_handler)
-    } > PRAM
     
     /*  
         This is the initialized data section

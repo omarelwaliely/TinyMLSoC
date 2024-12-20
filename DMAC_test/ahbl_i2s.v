@@ -167,20 +167,31 @@ module ahbl_i2s (
 
     //note wr is already assigned to rdy so when rdy it will know to begin writing
 
-    always @(posedge HCLK) begin
-        if(!HRESETn) begin
-            rd     <= 'h0;
-            flush    <= 'h00;
-            wdata    <= 'h0;
-        end
-    end
+    // always @(posedge HCLK) begin
+    //     if(!HRESETn) begin
+    //         rd     <= 'h0;
+    //         flush    <= 'h00;
+    //         wdata    <= 'h0;
+    //     end
+    // end
 
-    always@(posedge HCLK, negedge HRESETn) begin
-        if(wr & !WS) begin //note this will take the left and right sample, we can & with !WS to take the left sample only, Ill leave it this way for now
-            wdata = DATA_REG;
+    // always@(posedge HCLK, negedge HRESETn) begin
+    //     if(wr & !WS) begin //note this will take the left and right sample, we can & with !WS to take the left sample only, Ill leave it this way for now
+    //         wdata <= DATA_REG;
+    //     end
+    // end
+    always @(posedge HCLK or negedge HRESETn) begin
+    if (!HRESETn) begin
+        rd     <= 1'b0;
+        flush  <= 1'b0;
+        wdata  <= 32'b0;
+    end else begin
+        if (wr & !WS) begin
+            wdata <= DATA_REG; // Use non-blocking assignment
         end
     end
-    
+end
+
 
 
     always@(posedge HCLK, negedge HRESETn) begin
