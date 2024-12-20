@@ -102,15 +102,16 @@ module FRV_SoC (
  
 
 
-    //setting everything in DMAC to 0 until I make sure it works
-    wire[31:0] HADDR_DMAC = 32'd0;
-    wire HWRITE_DMAC = 1'd1;
-    wire [1:0] HTRANS_DMAC = 2'd0;
+    //trying dummy values to see if stopping cpu and taking control is possible
+    wire[31:0] HADDR_DMAC = 32'h20001000;
+    wire HWRITE_DMAC = 1'b1;
+    wire [1:0] HTRANS_DMAC = 2'b00; //to try transmitting i made this 10
     wire [2:0] HSIZE_DMAC = 3'd0;
     wire [2:0] HBURST_DMAC = 3'd0;
-    wire HMASTLOCK_DMAC = 1'b0;
-    wire [31:0] HWDATA_DMAC = 32'd0;
+    wire HMASTLOCK_DMAC = 1'b1;
+    wire [31:0] HWDATA_DMAC = 32'd100;
     wire [3:0] HPROT_DMAC = 4'd0; //we dont support prot
+    wire stop = 1'b0; //set this to 1 to take control
 
 
 
@@ -253,7 +254,9 @@ module FRV_SoC (
         .HWDATA(HWDATA_CPU),
         .HREADY(CPU_HREADY),
         .HRDATA(CPU_HRDATA),
-        .IRQ(IRQ)
+        .IRQ(IRQ),
+
+        .stop(stop)
     );
 
     ahbl_gpio GPIO_A (

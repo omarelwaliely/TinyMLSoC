@@ -8,7 +8,8 @@ module FRV_AHBL(
     output  wire [31:0] HWDATA,
     input   wire        HREADY,
     input   wire [31:0] HRDATA,
-    input   wire        IRQ
+    input   wire        IRQ,
+    input wire stop
   );
 
     wire [3:0]  mem_wmask;
@@ -36,7 +37,7 @@ module FRV_AHBL(
 
     assign HTRANS   =   {(HWRITE | mem_rstrb), 1'b0};
 
-    assign mem_rbusy=   !HREADY;
-    assign mem_wbusy=   !HREADY;
+    assign mem_rbusy=   !HREADY | stop;
+    assign mem_wbusy=   !HREADY | stop;
 
 endmodule

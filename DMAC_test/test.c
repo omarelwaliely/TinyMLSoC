@@ -98,7 +98,7 @@ int main() {
                   *gpio_data_A = 3;
 
     while (1) {
-         while (*i2s_done != 0x00000003);
+        //while (*i2s_done != 0x00000003);
           //x = *i2s_data;
               //*gpio_data_A = x;
 
