@@ -5,13 +5,13 @@ module i2s(
     output BCLK,
     input DIN,
     output reg done,
-    output [size -1:0] data,
+    output [32 -1:0] data,
     input en
 );
 
 reg BCLK_d, WS_d;
-localparam size = 32;
-reg [size -1 : 0] shift_reg;
+// localparam size = 32;
+reg [32 -1 : 0] shift_reg;
 reg [6:0] WS_cntr;
 reg [1:0] BCLK_cntr;
 reg [1:0] done_cntr;
@@ -84,7 +84,7 @@ always @(posedge clk, negedge rst_n) begin
     end
     else if(en) begin
         if( BCLK_cntr == 0 && !BCLK) begin 
-            shift_reg <= {shift_reg[size -2 : 0],DIN};
+            shift_reg <= {shift_reg[32 -2 : 0],DIN};
         end
     end
 end

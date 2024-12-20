@@ -91,24 +91,24 @@ int main() {
     enable_IRQ();
     volatile int add = 0x00000009;
    *i2s_en = add;
-    uart_init(3);         // Initialize UART with a baud rate setting
+    uart_init(625);         // Initialize UART with a baud rate setting
 
     volatile unsigned int x;
     volatile char c1, c2;
                   *gpio_data_A = 3;
 
     while (1) {
-        //while (*i2s_done != 0x00000003);
-          //x = *i2s_data;
-              //*gpio_data_A = x;
-
-        if(flag){
-            while(*i2s_fifo_status != 0x00000001){
-                x = *i2s_fifo_data;
-                uart_puts_hex(x);
-            }
-            flag = 0;
-        }
+        while (*i2s_done != 0x00000003);
+          x = *i2s_data;
+              *gpio_data_A = x;
+            uart_putc('g');
+        // if(flag){
+        //     while(*i2s_fifo_status != 0x00000001){
+        //         x = *i2s_fifo_data;
+        //         uart_puts_hex(x);
+        //     }
+        //     flag = 0;
+        // }
     }
     return 0;
 }
