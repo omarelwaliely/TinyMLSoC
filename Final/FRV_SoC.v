@@ -74,6 +74,9 @@ module FRV_SoC (
     wire        S0_HREADYOUT, S1_HREADYOUT, S2_HREADYOUT, S3_HREADYOUT, S4_HREADYOUT, S5_HREADYOUT;
 
 
+//--------------------------
+
+    wire vad_active;
 
     FRV_AHBL CPU (
         .HCLK(HCLK),
@@ -173,7 +176,8 @@ module FRV_SoC (
         .SD(I2S_in),      
         .SCK(i2s_clk),
         .WS(ws),
-        .IRQ(IRQ)
+        .IRQ(IRQ),
+        .vad_active(vad_active)
 
 );
 
