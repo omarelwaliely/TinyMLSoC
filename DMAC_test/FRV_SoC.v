@@ -201,7 +201,7 @@ module FRV_SoC (
     wire [1:0] sHTRANS_DMAC = dst_htrans[0+:2];
 
 
-
+    wire vad_active;
 
 
 
@@ -370,7 +370,9 @@ module FRV_SoC (
         .WS(ws),
         .IRQ(PIRQ_I2S),
 
-        .DMAC_interaction(stop)
+        .DMAC_interaction(stop),
+
+        .vad_active(vad_active)
 
 );
 

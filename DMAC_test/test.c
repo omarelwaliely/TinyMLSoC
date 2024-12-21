@@ -116,7 +116,7 @@ void dmac_init(dmac_descriptor *d){
     *dmac_saddr = d->saddr;
     *dmac_daddr = d->daddr;
     *dmac_scfg  = d->ssize  + d->sinc*16;
-    *dmac_dcfg  = d->dsize  + d->dinc*16;
+    *dmac_dcfg  = d->dsize  + d->dinc*32;
     *dmac_cfg   = d->wfi    + d->irqsrc*16;
     *dmac_bcount= d->bcount;
     *dmac_bsize = d->bsize;
@@ -147,8 +147,8 @@ int main() {
     dd.saddr = 0x44100000;  
     dd.daddr = (unsigned int) mic_out;  
     dd.bcount = 16;  
-    dd.bsize = 1;    
-    dd.sinc = 1;   
+    dd.bsize = 4;    
+    dd.sinc = 0;   
     dd.dinc = 1;   
     dd.ssize = 2; 
     dd.dsize = 2;   

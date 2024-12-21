@@ -18,6 +18,7 @@ module ahbl_i2s (
     input  wire        SD,
     output wire        SCK,
     output wire        WS,
+    output wire vad_active,
 
     input wire DMAC_interaction,
     output wire IRQ
@@ -160,7 +161,8 @@ module ahbl_i2s (
         .en(CTRL_REG[0]),
         .DIN(SD),
         .BCLK(SCK),
-        .WS(WS)
+        .WS(WS),
+        .vad_active(vad_active)
     );
 
 
