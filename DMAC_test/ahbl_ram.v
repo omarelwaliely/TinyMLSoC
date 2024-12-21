@@ -64,6 +64,9 @@ module ahbl_ram (
     wire byte2 = word_at_00 | half_at_10 | byte_at_10;
     wire byte3 = word_at_00 | half_at_10 | byte_at_11;
 
+        // wire ahbl_re            = HTRANS_d[1]  & !HWRITE_d;
+
+
     // Writing to the memory
     always @(posedge HCLK)
     begin
@@ -76,6 +79,14 @@ module ahbl_ram (
             if(byte3) RAM[HADDR_d[A_WIDTH-1 : 2]][31:24]   <= HWDATA[31:24];
         end
     end
+
+    // always @(posedge HCLK)
+    // begin
+    //     if(ahbl_re) begin
+    //         if(VERBOSE)
+    //             $display("read [%x] from SRAM: [%x]=%x (%0t)", HSIZE_d, HADDR_d, HWDATA, $time);
+    //     end
+    // end
 
     assign HRDATA = RAM[HADDR_d[A_WIDTH-1 : 2]];
 

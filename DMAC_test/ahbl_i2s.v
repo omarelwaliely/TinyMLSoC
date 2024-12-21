@@ -19,6 +19,7 @@ module ahbl_i2s (
     output wire        SCK,
     output wire        WS,
 
+    input wire DMAC_interaction,
     output wire IRQ
 
 );
@@ -104,7 +105,8 @@ module ahbl_i2s (
 
 
 
-    assign HRDATA = DATA_REG_SEL   ? DATA_REG             :  
+    assign HRDATA = DMAC_interaction ? FIFO_DATA_REG :
+                    DATA_REG_SEL   ? DATA_REG             :  
                     CTRL_REG_SEL   ? user_CTRL_REG    :
                     DONE_REG_SEL   ? user_DONE_REG    :
                     FIFO_STATUS_REG_SEL   ? user_FIFO_STATUS_REG    :
@@ -199,11 +201,12 @@ end
                 FIFO_DATA_REG<=32'd0;
             end
             else begin
-                if (ahbl_re && FIFO_DATA_REG_SEL)begin
+                if ((ahbl_re && FIFO_DATA_REG_SEL) | ahbl_re && DMAC_interaction)begin
                     rd<=1;
+                    FIFO_DATA_REG<=rdata;
                 end
                 else begin
-                    FIFO_DATA_REG <= rdata;
+                    // FIFO_DATA_REG <= rdata;
                     rd<=0;
                 end
             end

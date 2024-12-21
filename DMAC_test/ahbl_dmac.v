@@ -249,22 +249,20 @@ module ahbl_dmac (
                         ICRV_sel ? ICRV :
                         32'hBAD0F00D;
 
-reg [1:0] prev_STATUS; 
+reg prev_done; 
 reg irq_pulse;  
 
 always @(posedge HCLK or negedge HRESETn) begin
     if (!HRESETn) begin
         irq_pulse   <= 1'b0;
-        prev_STATUS <= 2'b0;
+        prev_done   <= 1'b0;
     end else begin
-        // Detect rising edge of STATUS[0] (done flag)
-        if (STATUS[0] && !prev_STATUS[0]) 
-            irq_pulse <= 1'b1; // Generate a pulse
+        if (done && !prev_done) 
+            irq_pulse <= 1'b1; 
         else
-            irq_pulse <= 1'b0; // Clear the pulse after one clock cycle
+            irq_pulse <= 1'b0; 
 
-        // Update the previous STATUS value
-        prev_STATUS <= STATUS;
+        prev_done <= done;
     end
 end
 

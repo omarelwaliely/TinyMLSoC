@@ -31,6 +31,9 @@ volatile unsigned int* dmac_bsize   = (volatile unsigned int*) 0x6000001C;
 volatile unsigned int* dmac_status  = (volatile unsigned int*) 0x60000020;
 
 
+    volatile uint32_t mic_out[16] = {0};
+
+
 typedef struct {
     unsigned int saddr;    
     unsigned int daddr;    
@@ -59,7 +62,11 @@ void return_m(void){
 }
 
 void isr_handler(void) {
-    flag = 1;    
+    flag = 1;
+    // for (int i = 0; i < 16; i++) {
+    //             uart_puts_hex(mic_out[i]);
+    //             // uart_putc('f');
+    //         }    
     return_m();
 
 }
@@ -115,6 +122,17 @@ void dmac_init(dmac_descriptor *d){
     *dmac_bsize = d->bsize;
 }
 
+
+// void dmac_init(dmac_descriptor *d) {
+//     *dmac_saddr = d->saddr; 
+//     *dmac_daddr = d->daddr;
+//     *dmac_scfg = (d->ssize & 0x7) | ((d->sinc & 0x7) << 4); 
+//     *dmac_dcfg = (d->dsize & 0x7) | ((d->dinc & 0x7) << 4);
+//     *dmac_cfg = (d->wfi & 0x1) | ((d->irqsrc & 0x7) << 4); 
+//     *dmac_bcount = d->bcount;
+//     *dmac_bsize = d->bsize;  
+// }
+
 void *memset(void *s, int c, size_t n) {
     unsigned char *ptr = s;
     while (n--) {
@@ -126,17 +144,16 @@ void *memset(void *s, int c, size_t n) {
 
 int main() {
     dmac_descriptor dd;
-    uint32_t mic_out[16] = {0};
-    dd.saddr = 0x44100000;
-    dd.daddr =  (unsigned int) mic_out;
-    dd.bcount = 16;
-    dd.bsize = 8;
-    dd.wfi = 0;
+    dd.saddr = 0x44100000;  
+    dd.daddr = (unsigned int) mic_out;  
+    dd.bcount = 16;  
+    dd.bsize = 1;    
+    dd.sinc = 1;   
+    dd.dinc = 1;   
+    dd.ssize = 2; 
+    dd.dsize = 2;   
+    dd.wfi = 0;    
     dd.irqsrc = 0;
-    dd.sinc=1;
-    dd.dinc=1;
-    dd.ssize=0;
-    dd.dsize=0;
 
     dmac_init(&dd);
     //dmac_start();
@@ -155,11 +172,15 @@ int main() {
     volatile int count =0;
     while (1) {
         //count +=1;
-        if(flag){
+       if(flag){
             // while(*i2s_fifo_status != 0x00000001){
             //     x = *i2s_fifo_data;
             //     uart_puts_hex(x);
             // }
+           for (int i = 0; i < 16; i++) {
+                uart_puts_hex(mic_out[i]);
+            }
+
             flag = 0;
         }
     }

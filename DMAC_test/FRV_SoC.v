@@ -135,7 +135,7 @@ module FRV_SoC (
     //assigning output master wires
 
     wire [W_DATA-1:0] CPU_HRDATA = src_hrdata[W_DATA*0+:W_DATA];
-    wire [W_DATA-1:0] mDMAC_HRDATA = src_hrdata[W_DATA*1:W_DATA];
+    wire [W_DATA-1:0] mDMAC_HRDATA = src_hrdata[W_DATA*1+:W_DATA];
 
     wire CPU_HREADY = src_hready_resp[0];
     wire mDMAC_HREADY = src_hready_resp[1];
@@ -368,7 +368,9 @@ module FRV_SoC (
         .SD(I2S_in),      
         .SCK(i2s_clk),
         .WS(ws),
-        .IRQ(PIRQ_I2S)
+        .IRQ(PIRQ_I2S),
+
+        .DMAC_interaction(stop)
 
 );
 
