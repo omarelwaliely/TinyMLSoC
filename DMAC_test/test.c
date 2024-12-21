@@ -177,9 +177,9 @@ int main() {
             //     x = *i2s_fifo_data;
             //     uart_puts_hex(x);
             // }
-           for (int i = 0; i < 16; i++) {
-                uart_puts_hex(mic_out[i]);
-            }
+        //    for (int i = 0; i < 16; i++) {
+        //         uart_puts_hex(mic_out[i]);
+        //     }
 
             flag = 0;
         }

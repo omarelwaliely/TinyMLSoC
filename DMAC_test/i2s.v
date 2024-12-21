@@ -20,7 +20,7 @@ reg [size - 1:0] shift_reg;
 reg [6:0] WS_cntr;
 reg [1:0] BCLK_cntr;
 reg [1:0] done_cntr;
-reg [47:0] accumulator; // 16-bit accumulator for VAD (modify based on precision requirements)
+reg [75:0] accumulator; // 16-bit accumulator for VAD (modify based on precision requirements)
 reg [6:0] sample_count; // Tracks the number of samples in the current window
 reg sliding;            // Indicates if the sliding window logic is active
 
@@ -104,6 +104,9 @@ always @(posedge clk or negedge rst_n) begin
 end
 
 // VAD Logic: Accumulator and Sliding Window
+wire [37:0]left_accum = abs(accumulator[76 - 1:38]);
+wire [37:0]right_accum = abs(accumulator[38 -1:0]);
+
 always @(posedge clk or negedge rst_n) begin
     if (!rst_n) begin
         accumulator <= 0;
@@ -112,8 +115,8 @@ always @(posedge clk or negedge rst_n) begin
         vad_active <= 0;
     end
     else if (en  && done) begin
-        if (BCLK_cntr == 0 && !BCLK && !WS) begin
-            accumulator <= accumulator + abs(shift_reg[size - 1:0]); // Add current sample to accumulator
+        if (1) begin
+            accumulator[38 -1:0] <= accumulator[38 -1:0] + abs(shift_reg[size - 1:0]); // Add current sample to accumulator
             sample_count <= sample_count + 1;
 
             // Check if window is full 80
@@ -123,9 +126,9 @@ always @(posedge clk or negedge rst_n) begin
             // end
 
             if (sample_count == slide_size) begin
-                vad_active <= ((abs(accumulator[48 - 1:24]) + abs(accumulator[24 -1:0])) > vad_threshold); // Check threshold
+                vad_active <= ((abs(accumulator[76 - 1:38]) + abs(accumulator[38 -1:0])) > vad_threshold); // Check threshold
                 //accumulator <= accumulator - abs(accumulator[48 - 1:24]); // Remove oldest sample
-                accumulator <= {accumulator[24 -1:0], 24'd0};  // shift 40 lsb of accumulator to the left
+                accumulator <= {accumulator[38 -1:0], 38'd0};  // shift 40 lsb of accumulator to the left
                 sample_count <= 0; // Reset sample count for sliding window
             end
                 

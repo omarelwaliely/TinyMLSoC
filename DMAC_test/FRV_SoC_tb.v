@@ -71,7 +71,7 @@ module FRV_SoC_tb;
         wait(HRESETn == 1'b1);   
         @(posedge HCLK);         
         en = 1;    
-        #100000; 
+        #1000000; 
         $finish; // End the simulation
     end
 
