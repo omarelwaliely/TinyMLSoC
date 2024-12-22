@@ -1,39 +1,87 @@
-General Notes
+# Voice Detection on FRV-SoC
 
-Github repo: YosysHQ/oss-cad-suite-build
+## Introduction
+This project implements a voice detection system on the FRV-SoC platform. The system leverages a TinyML-capable SoC to detect audio input through an I2S microphone. Upon detecting a voice, the system triggers an interrupt, processes the audio data using a DMA controller, and displays the results via UART. Additionally, an LED lights up to indicate voice detection.
 
-Chip - ice40ulp
+The architecture integrates key modules such as a CPU, a DMA controller, a crossbar, and AHB-Lite/APB buses to connect various peripherals including I2S, RAM, ROM, UART, timer, and GPIOs. The I2S module includes a Voice Activity Detection (VAD) feature to efficiently detect the presence of voice signals.
 
-Yosys -- readmemh
+## Installations
+To set up the project, ensure the following tools are installed:
 
-Flash - GD25Q32
+- **RISCV32 Toolchain**: For compiling firmware.
+- **Yosys**: For synthesis.
+- **nextpnr**: For placement and routing.
+- **icepack**: For generating bitstreams.
 
-To run verilog files: `iverilog file_name.v`
+## How to Run
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/omarelwaliely/TinyMLSoC.git
+   cd TinyMLSoC/DMAC_test
+   ```
 
-UART - TX 8N1
-UART -- 1 start bit (0) -- 8 bits data -- 1/2 stop bits (1)
-Baud rate -- bits/sec or symbols/sec
+2. Run the Makefile
+   ```bash
+   make clean
+   make
+   make runfpga
+   ```
 
-Ex: Baud rate = 9600 bits/sec --> time to transfer 1 bit = 1/9600 = 104microsec
-If freq = 12MHz --> T = 1/12M = 83.33msec
-12M/9600 = 1250 = No of clk cycles needed to transfer to one bit
-use a down counter that starts from 1250 and when 0 is reached reload.
 
-Low Power 
-1. Dymanic -- CVdd^2 f
-2. Static -- I_leakage Vdd
+## Module Descriptions
+### 1. CPU
+- Central controller that processes audio data after DMA transfer.
+- Interfaces with the UART to display results.
 
-On Chip Oscillators
-LS RCOSC
-HS RCOSC
+### 2. DMA Controller
+- Handles data transfer from the I2S FIFO to the CPU.
+- Reduces CPU overhead by automating memory access.
 
-Off Chip Oscillators
-Crystal Oscillator HS
-Crystal Oscillator LS
+### 3. Crossbar
+- Connects the CPU, DMA controller, and peripherals via AHB-Lite and APB buses.
+- Ensures efficient data flow between modules.
 
-Why off chip oscillators?
-1. High precision
-2. Not affected by temperature
-3. Not affected by voltage
+### 4. Peripherals
+- I2S Microphone: Captures audio samples. Includes a Voice Activity Detection (VAD) module for efficient voice signal detection.
+- RAM: Temporary storage for intermediate data.
+- ROM: Stores firmware and configuration.
+- UART: Outputs detection results to a terminal.
+- Timer: Provides precise timing and interrupt capabilities.
+- GPIOs: Controls external devices and LEDs.
 
-To avoid glitches between clk source transitions, use a clk mux to select the clk source and then use a flip flop to sample the clk signal.
+## Architecture
+![System Architecture](./DMAC_test/SoC.png)
+
+The architecture consists of the following key components:
+
+- **Controllers**:
+  - CPU: Main processor for control and data processing.
+  - DMA Controller: Transfers data from peripherals to memory.
+
+- **Crossbar**:
+  - Connects the controllers to AHB-Lite and APB buses.
+
+- **Peripherals**:
+  - I2S for audio input. Includes a vad module for efficient voice signal detection.
+  - RAM and ROM for memory operations.
+  - UART for communication.
+  - Timer and GPIOs for additional functionalities.
+
+### Data Flow
+1. **Audio Detection**: I2S captures audio samples and fills the FIFO.
+2. **Interrupt Trigger**: FIFO generates an interrupt when full.
+3. **DMA Transfer**: DMA controller moves data to RAM for CPU processing.
+4. **CPU Processing**: CPU processes the data and sends results over UART.
+5. **LED Indicator**: LED lights up upon voice detection.
+
+## Results
+- **Voice Detection**: Accurate detection of audio signals using the I2S microphone.
+- **Efficient Data Transfer**: Minimal CPU overhead due to DMA controller.
+- **User Feedback**: Clear indication of detection via LED and UART output.
+
+## Sample Output
+![](./DMAC_test/sample.jpeg)
+
+---
+For further details, refer to the [GitHub repository](https://github.com/omarelwaliely/TinyMLSoC/tree/main/DMAC_test).
+
