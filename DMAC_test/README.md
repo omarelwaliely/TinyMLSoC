@@ -79,6 +79,9 @@ The architecture consists of the following key components:
 - **Efficient Data Transfer**: Minimal CPU overhead due to DMA controller.
 - **User Feedback**: Clear indication of detection via LED and UART output.
 
+## Sample Output
+![](sample.jpeg)
+
 ---
 For further details, refer to the [GitHub repository](https://github.com/omarelwaliely/TinyMLSoC/tree/main/DMAC_test).
 
