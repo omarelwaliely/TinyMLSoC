@@ -256,7 +256,7 @@ assign test =1;
         .HSIZE(HSIZE_CPU),
         .HWRITE(HWRITE_CPU),
         .HWDATA(HWDATA_CPU),
-        .HREADY(1'b1),
+        .HREADY(CPU_HREADY),
         .HRDATA(CPU_HRDATA),
         .IRQ(IRQ),
 
@@ -276,8 +276,8 @@ assign test =1;
     .mHWDATA(mHWDATA_DMAC),
     .mHREADY(mDMAC_HREADY),
     .mHRDATA(mDMAC_HRDATA),
-    .PIRQ(8'd0),
-    //.PIRQ({7'b0000000,PIRQ_I2S}),
+    //.PIRQ(8'd0),
+    .PIRQ({7'b0000000,PIRQ_I2S}),
 
     .sHADDR(sHADDR_DMAC),
     .sHTRANS(sHTRANS_DMAC),
@@ -312,7 +312,7 @@ assign test =1;
     );
 
 
-    ahbl_ram #(.SIZE(8*1024)) PMEM (
+    ahbl_ram #(.SIZE(8*740)) PMEM (
         .HCLK(HCLK),
         .HRESETn(HRESETn),
 
@@ -326,7 +326,7 @@ assign test =1;
         .HRDATA(S0_HRDATA)
     );
 
-    ahbl_ram #(.SIZE(8*740)) DMEM (
+    ahbl_ram #(.SIZE(8*1024)) DMEM (
         .HCLK(HCLK),
         .HRESETn(HRESETn),
 

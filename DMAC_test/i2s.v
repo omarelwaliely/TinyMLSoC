@@ -39,7 +39,7 @@ module i2s #(parameter WSZ=32)(
     localparam size = 32;
     localparam window_size = 80; // Window size for accumulation
     localparam slide_size = 40;  // Sliding window size
-    localparam vad_threshold = 4200000000;   //4000000000 5000000000
+    localparam vad_threshold = 4220000000;   //4200000000
 
     reg [75:0] accumulator; // 16-bit accumulator for VAD (modify based on precision requirements)
     reg [6:0] sample_count;

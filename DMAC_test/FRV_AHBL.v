@@ -37,7 +37,7 @@ module FRV_AHBL(
 
     assign HTRANS   =   {(HWRITE | mem_rstrb), 1'b0};
 
-    assign mem_rbusy=   !HREADY | stop;
-    assign mem_wbusy=   !HREADY | stop;
+    assign mem_rbusy=   !HREADY;
+    assign mem_wbusy=   !HREADY;
 
 endmodule

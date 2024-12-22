@@ -46,7 +46,7 @@ module ahbl_i2s (
     reg rdy_sync1, rdy_sync2;
 
 
-    reg rd,flush;
+    reg flush;
     wire wr = rdy;
     wire empty;
     wire [DW-1:0]   rdata;
@@ -202,7 +202,6 @@ module ahbl_i2s (
     // end
     always @(posedge HCLK or negedge HRESETn) begin
     if (!HRESETn) begin
-        rd     <= 1'b0;
         flush  <= 1'b0;
         wdata  <= 32'b0;
     end else begin
@@ -212,6 +211,7 @@ module ahbl_i2s (
     end
 end
 
+wire rd = ahbl_re && FIFO_DATA_REG_SEL;
 
 
     always@(posedge HCLK, negedge HRESETn) begin
@@ -220,12 +220,7 @@ end
             end
             else begin
                 if ((ahbl_re && FIFO_DATA_REG_SEL))begin
-                    rd<=1;
                     FIFO_DATA_REG<=rdata;
-                end
-                else begin
-                    // FIFO_DATA_REG <= rdata;
-                    rd<=0;
                 end
             end
     end

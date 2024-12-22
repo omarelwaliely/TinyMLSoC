@@ -249,23 +249,37 @@ module ahbl_dmac (
                         ICRV_sel ? ICRV :
                         32'hBAD0F00D;
 
-reg prev_done; 
+// reg prev_done; 
 reg irq_pulse;  
 
-always @(posedge HCLK or negedge HRESETn) begin
-    if (!HRESETn) begin
-        irq_pulse   <= 1'b0;
-        prev_done   <= 1'b0;
-    end else begin
-        if (done && !prev_done) 
-            irq_pulse <= 1'b1; 
-        else
-            irq_pulse <= 1'b0; 
+// always @(posedge HCLK or negedge HRESETn) begin
+//     if (!HRESETn) begin
+//         irq_pulse   <= 1'b0;
+//         prev_done   <= 1'b0;
+//     end else begin
+//         if (done && !prev_done) 
+//             irq_pulse <= 1'b1; 
+//         else
+//             irq_pulse <= 1'b0; 
 
-        prev_done <= done;
-    end
-end
+//         prev_done <= done;
+//     end
+// end
 
-assign IRQ = irq_pulse;
+
+
+// always @(posedge HCLK or negedge HRESETn) begin
+//     if (!HRESETn) begin
+//         irq_pulse   <= 1'b0;
+//     end else begin
+//         if (done) 
+//             irq_pulse <= 1'b1; 
+//     end
+// end
+
+
+assign IRQ = done;
+
+// assign IRQ = done;
 
 endmodule

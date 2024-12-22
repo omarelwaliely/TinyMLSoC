@@ -63,11 +63,11 @@ void return_m(void){
 
 void isr_handler(void) {
     flag = 1;
-    //for (int i = 0; i < 16; i++) {
-              //  uart_puts_hex(mic_out[i]);
-                // uart_putc('f');
-            //}    
-            //uart_putc('g');
+    for (int i = 0; i < 16; i++) {
+               uart_puts_hex(mic_out[i]);
+                //uart_putc('f');
+            }    
+           // uart_putc('g');
     return_m();
 
 }
@@ -149,8 +149,8 @@ int main() {
     dmac_descriptor dd;
     dd.saddr = 0x44000010;  
     dd.daddr = (unsigned int) mic_out;  
-    dd.bcount = 16;  
-    dd.bsize = 2;    
+    dd.bcount = 1;  
+    dd.bsize = 15;    
     dd.sinc = 0;   
     dd.dinc = 1;   
     dd.ssize = 2; 
@@ -184,9 +184,14 @@ int main() {
     //     c2 = (data >> 16) & 0xFF; // Second byte (bits 23:16)
     //     uart_putc(c1);
     //     uart_putc(c2);
-    if(flag){
-        flag =0;
-    }
+    //uart_putc('t');
+    // if(flag){
+    // for (int i = 0; i < 16; i++) {
+    //            uart_puts_hex(mic_out[i]);
+    //             //uart_putc('f');
+    //         }   
+    //         flag =0; 
+    // }
         // uart_puts_hex(data);
         //uart_putc('g');
         //uart_puts_hex(0xFFFFFFFF);
