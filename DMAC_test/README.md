@@ -3,7 +3,7 @@
 ## Introduction
 This project implements a voice detection system on the FRV-SoC platform. The system leverages a TinyML-capable SoC to detect audio input through an I2S microphone. Upon detecting a voice, the system triggers an interrupt, processes the audio data using a DMA controller, and displays the results via UART. Additionally, an LED lights up to indicate voice detection.
 
-The architecture integrates key modules such as a CPU, a DMA controller, a crossbar, and AHB-Lite/APB buses to connect various peripherals including I2S, RAM, ROM, and UART.
+The architecture integrates key modules such as a CPU, a DMA controller, a crossbar, and AHB-Lite/APB buses to connect various peripherals including I2S, RAM, ROM, UART, timer, and GPIOs. The I2S module includes a Voice Activity Detection (VAD) feature to efficiently detect the presence of voice signals.
 
 ## Installations
 To set up the project, ensure the following tools are installed:
@@ -42,12 +42,16 @@ To set up the project, ensure the following tools are installed:
 - Ensures efficient data flow between modules.
 
 ### 4. Peripherals
-- **I2S Microphone**: Captures audio samples.
-- **RAM**: Temporary storage for intermediate data.
-- **ROM**: Stores firmware and configuration.
-- **UART**: Outputs detection results to a terminal.
+- I2S Microphone: Captures audio samples. Includes a Voice Activity Detection (VAD) module for efficient voice signal detection.
+- RAM: Temporary storage for intermediate data.
+- ROM: Stores firmware and configuration.
+- UART: Outputs detection results to a terminal.
+- Timer: Provides precise timing and interrupt capabilities.
+- GPIOs: Controls external devices and LEDs.
 
 ## Architecture
+![System Architecture](SoC.png)
+
 The architecture consists of the following key components:
 
 - **Controllers**:
@@ -61,6 +65,7 @@ The architecture consists of the following key components:
   - I2S for audio input. Includes a vad module for efficient voice signal detection.
   - RAM and ROM for memory operations.
   - UART for communication.
+  - Timer and GPIOs for additional functionalities.
 
 ### Data Flow
 1. **Audio Detection**: I2S captures audio samples and fills the FIFO.
