@@ -1,7 +1,7 @@
 #include <stdint.h>
 #include <stddef.h>
 volatile unsigned int* gpio_data_A = (volatile unsigned int *) 0x40000000;
-volatile unsigned int* gpio_oe_A = (volatile unsigned int *) 0x40000004;
+// volatile unsigned int* gpio_oe_A = (volatile unsigned int *) 0x40000004;
 
 volatile unsigned int* i2s_en = (volatile unsigned int*) 0x44000000;
 volatile unsigned int* i2s_done = (volatile unsigned int*) 0x44000004;
@@ -63,10 +63,11 @@ void return_m(void){
 
 void isr_handler(void) {
     flag = 1;
-    // for (int i = 0; i < 16; i++) {
-    //             uart_puts_hex(mic_out[i]);
-    //             // uart_putc('f');
-    //         }    
+    //for (int i = 0; i < 16; i++) {
+              //  uart_puts_hex(mic_out[i]);
+                // uart_putc('f');
+            //}    
+            //uart_putc('g');
     return_m();
 
 }
@@ -97,21 +98,23 @@ void uart_puts(char *s) {
 
 void uart_puts_hex(int num) {
     char hex_string[11]; // 8 characters for 32-bit hex + \r + \n + null terminator
-    for (int i = 0; i < 8; i++) {
-        int nibble = (num >> (28 - 4 * i)) & 0xF; // Extract each hex nibble
-        if (nibble < 10) {
-            hex_string[i] = '0' + nibble; // 0-9
-        } else {
-            hex_string[i] = 'A' + (nibble - 10); // A-F
-        }
-    }
+    const char hex_chars[] = "0123456789ABCDEF";
+
+    // Map each nibble to its corresponding hex character
+    hex_string[0] = hex_chars[(num & 0xF0000000) >> 28]; // Highest nibble
+    hex_string[1] = hex_chars[(num & 0x0F000000) >> 24];
+    hex_string[2] = hex_chars[(num & 0x00F00000) >> 20];
+    hex_string[3] = hex_chars[(num & 0x000F0000) >> 16];
+    hex_string[4] = hex_chars[(num & 0x0000F000) >> 12];
+    hex_string[5] = hex_chars[(num & 0x00000F00) >> 8];
+    hex_string[6] = hex_chars[(num & 0x000000F0) >> 4];
+    hex_string[7] = hex_chars[(num & 0x0000000F)];       // Lowest nibble
     hex_string[8] = '\r'; // Carriage return
     hex_string[9] = '\n'; // Newline
     hex_string[10] = '\0'; // Null terminator
 
     uart_puts(hex_string); // Send the hex string with UART
 }
-
 void dmac_init(dmac_descriptor *d){
     *dmac_saddr = d->saddr;
     *dmac_daddr = d->daddr;
@@ -144,10 +147,10 @@ void *memset(void *s, int c, size_t n) {
 
 int main() {
     dmac_descriptor dd;
-    dd.saddr = 0x44100000;  
+    dd.saddr = 0x44000010;  
     dd.daddr = (unsigned int) mic_out;  
     dd.bcount = 16;  
-    dd.bsize = 4;    
+    dd.bsize = 2;    
     dd.sinc = 0;   
     dd.dinc = 1;   
     dd.ssize = 2; 
@@ -161,28 +164,34 @@ int main() {
     enable_IRQ(isr_handler);
 
 
-    volatile int add = 0x00000009;
-   *i2s_en = add;
+    //volatile int add = 0x00000009;
+    *i2s_en =  0x09;
     uart_init(3);         // Initialize UART with a baud rate setting
 
     volatile unsigned int x;
-    volatile char c1, c2;
-                  *gpio_data_A = 3;
+    volatile char c1 = 'a';
+    volatile char c2 = 'b';
+                //   *gpio_data_A = 3;
 
     volatile int count =0;
-    while (1) {
-        //count +=1;
-       if(flag){
-            // while(*i2s_fifo_status != 0x00000001){
-            //     x = *i2s_fifo_data;
-            //     uart_puts_hex(x);
-            // }
-        //    for (int i = 0; i < 16; i++) {
-        //         uart_puts_hex(mic_out[i]);
-        //     }
 
-            flag = 0;
-        }
+    while (1) {
+
+    //  while (*i2s_done != 0x03); // Wait for I2S data to be ready
+    //     volatile uint32_t data = *i2s_data;
+
+    //     c1 = (data >> 24) & 0xFF; // Most significant byte (bits 31:24)
+    //     c2 = (data >> 16) & 0xFF; // Second byte (bits 23:16)
+    //     uart_putc(c1);
+    //     uart_putc(c2);
+    if(flag){
+        flag =0;
+    }
+        // uart_puts_hex(data);
+        //uart_putc('g');
+        //uart_puts_hex(0xFFFFFFFF);
+        //uart_puts_hex(0xFFFFFFFF);
+ 
     }
     return 0;
 }

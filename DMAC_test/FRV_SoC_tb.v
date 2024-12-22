@@ -22,7 +22,7 @@ module FRV_SoC_tb;
     // Clock generation
     initial begin
         HCLK = 0;
-    forever #5 HCLK = ~HCLK;
+    forever #1 HCLK = ~HCLK;
     end
 
 
@@ -71,7 +71,7 @@ module FRV_SoC_tb;
         wait(HRESETn == 1'b1);   
         @(posedge HCLK);         
         en = 1;    
-        #1000000; 
+        #100000; 
         $finish; // End the simulation
     end
 

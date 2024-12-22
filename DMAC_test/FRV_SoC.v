@@ -25,8 +25,13 @@ module FRV_SoC (
     output wire         HWRITE,
     output wire [31:0]  HWDATA,
     output wire         HREADY,
-    output wire [31:0]  HRDATA
+    output wire [31:0]  HRDATA,
+   // output wire [2:0] LED_out,
+    output wire vad_active,
+    output wire test
+
 );
+assign test =1;
 
 //----------------------------------
 // APB Bridge and Peripheral Signals
@@ -201,7 +206,6 @@ module FRV_SoC (
     wire [1:0] sHTRANS_DMAC = dst_htrans[0+:2];
 
 
-    wire vad_active;
 
 
 
@@ -272,7 +276,8 @@ module FRV_SoC (
     .mHWDATA(mHWDATA_DMAC),
     .mHREADY(mDMAC_HREADY),
     .mHRDATA(mDMAC_HRDATA),
-    .PIRQ({7'b0000000,PIRQ_I2S}),
+    .PIRQ(8'd0),
+    //.PIRQ({7'b0000000,PIRQ_I2S}),
 
     .sHADDR(sHADDR_DMAC),
     .sHTRANS(sHTRANS_DMAC),
@@ -370,7 +375,7 @@ module FRV_SoC (
         .WS(ws),
         .IRQ(PIRQ_I2S),
 
-        .DMAC_interaction(stop),
+        // .DMAC_interaction(stop),
 
         .vad_active(vad_active)
 

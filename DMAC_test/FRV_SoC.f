@@ -28,3 +28,4 @@ onehot_mux.v
 onehot_priority.v
 ahbl_dmac.v
 dmac_master.v
+tmr.v

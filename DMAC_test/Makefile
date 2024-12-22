@@ -1,5 +1,5 @@
 CROSS=riscv64-unknown-elf-
-CFLAGS=-march=rv32ic_zicsr -mabi=ilp32 -ffreestanding -nostdlib -O3 -Wall 
+CFLAGS=-march=rv32ic_zicsr -mabi=ilp32 -ffreestanding -nostdlib -Wall 
 LFLAGS=-Wl,--build-id=none,-Bstatic,-T,link.ld,--strip-debug
 VFILES=FRV_SoC.f
 TBFILES=FRV_SoC_tb.v
@@ -61,7 +61,7 @@ runfpga: yosysfpga routing icepacking prog
 
 
 yosysfpga: 
-	yosys -p "synth_ice40 -top top -json top.json" top.v Hazard2_SoC.v hazard2_cpu.v Hazard2.v ahbl_splitter.v ahbl_timer.v upcounter.v ahbl_gpio_splitter.v ahbl_uart_tx.v uart_tx.v uart_rx.v ahbl_ram.v ahbl_rom.v ahbl_gpio.v lightcontrol.v 
+	yosys -p "synth_ice40 -top top -json top.json" top.v Hazard2_SoC.v hazard2_cpu.v Hazard2.v FRV_AHBL.v FRV_SoC.v FemtoRV32.v ahbl_splitter.v ahbl_splitter_cross.v ahbl_gpio_splitter.v ahbl_ram.v ahbl_rom.v ahbl_gpio.v uart_tx.v serial_terminal.v ahbl_uart_tx.v upcounter.v ahbl_timer.v apb.v apb_slave.v apb2ahbl.v apb_gpio.v FIFO.v i2s.v i2s_test.v ahbl_i2s.v ahbl_crossbar.v ahbl_arbiter.v onehot_mux.v onehot_priority.v ahbl_dmac.v dmac_master.v tmr.v 
 
 routing:
 	nextpnr-ice40 --up5k  --package sg48 --json top.json --asc top.asc --pcf  SoC.pcf --pcf-allow-unconstrained
@@ -70,4 +70,4 @@ icepacking:
 	icepack top.asc top.bin
 
 prog:
-	iceprog top.bin
+	sudo /home/oss-cad-suite/bin/iceprog top.bin

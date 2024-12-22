@@ -22,7 +22,7 @@ module Hazard2_SoC_tb;
     // Clock generation
     initial begin
         HCLK = 0;
-    forever #3 HCLK = ~HCLK; // 6 MHz clock 
+    forever #83.33 HCLK = ~HCLK; // 6 MHz clock 
     end
 
 
@@ -71,7 +71,7 @@ module Hazard2_SoC_tb;
         wait(HRESETn == 1'b1);   
         @(posedge HCLK);         
         en = 1;    
-        #10000000;  // Run simulation for 1000ns (1us) before stopping
+        #10000;  // Run simulation for 1000ns (1us) before stopping
         $finish; // End the simulation
     end
 

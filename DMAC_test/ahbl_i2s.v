@@ -20,7 +20,6 @@ module ahbl_i2s (
     output wire        WS,
     output wire vad_active,
 
-    input wire DMAC_interaction,
     output wire IRQ
 
 );
@@ -106,14 +105,12 @@ module ahbl_i2s (
 
 
 
-    assign HRDATA = DMAC_interaction ? FIFO_DATA_REG :
-                    DATA_REG_SEL   ? DATA_REG             :  
+  
+    assign HRDATA = DATA_REG_SEL   ? DATA_REG             :  
                     CTRL_REG_SEL   ? user_CTRL_REG    :
                     DONE_REG_SEL   ? user_DONE_REG    :
                     FIFO_STATUS_REG_SEL   ? user_FIFO_STATUS_REG    :
                     FIFO_DATA_REG_SEL  ? FIFO_DATA_REG    :
-
-
                     32'hBADDBEEF;
 
 
@@ -151,19 +148,38 @@ module ahbl_i2s (
 
     assign HREADYOUT = 1'b1; // Always ready
 
-
-
     i2s i2s_wrap(
         .clk(HCLK),
         .rst_n(HRESETn),
-        .data(sample),
-        .done(rdy),
-        .en(CTRL_REG[0]),
-        .DIN(SD),
-        .BCLK(SCK),
+        .mode(CTRL_REG[0]),
+        .tick(tick),
+        .sample(sample),
+        .rdy(rdy),
+        .SD(SD),
+        .SCK(SCK),
         .WS(WS),
         .vad_active(vad_active)
     );
+    tmr timer (
+    .clk(HCLK),
+    .rst_n(HRESETn),
+    .clkdiv('h03),
+    .load('h00),
+    .en(CTRL_REG[0]),
+    .irq(tick)
+   );
+
+    // i2s i2s_wrap(
+    //     .clk(HCLK),
+    //     .rst_n(HRESETn),
+    //     .data(sample),
+    //     .done(rdy),
+    //     .en(CTRL_REG[0]),
+    //     .DIN(SD),
+    //     .BCLK(SCK),
+    //     .WS(WS),
+    //     .vad_active(vad_active)
+    // );
 
 
 
@@ -203,7 +219,7 @@ end
                 FIFO_DATA_REG<=32'd0;
             end
             else begin
-                if ((ahbl_re && FIFO_DATA_REG_SEL) | ahbl_re && DMAC_interaction)begin
+                if ((ahbl_re && FIFO_DATA_REG_SEL))begin
                     rd<=1;
                     FIFO_DATA_REG<=rdata;
                 end
